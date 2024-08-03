@@ -1,15 +1,12 @@
 package com.learning.english.dao;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class JwtAuthenticationResponse {
-    private String accessToken;
+@NoArgsConstructor
+public class RefreshTokenRequest {
     private String refreshToken;
 }
