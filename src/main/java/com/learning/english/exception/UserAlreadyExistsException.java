@@ -1,4 +1,4 @@
-package com.learning.english.security;
+package com.learning.english.exception;
 
 public class UserAlreadyExistsException extends RuntimeException {
     public UserAlreadyExistsException(String message) {

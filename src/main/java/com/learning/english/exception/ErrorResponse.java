@@ -1,4 +1,4 @@
-package com.learning.english.security;
+package com.learning.english.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

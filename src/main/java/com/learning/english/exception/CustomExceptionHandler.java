@@ -1,4 +1,4 @@
-package com.learning.english.security;
+package com.learning.english.exception;
 
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;

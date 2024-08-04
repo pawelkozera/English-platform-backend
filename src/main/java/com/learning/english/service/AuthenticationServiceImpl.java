@@ -6,7 +6,7 @@ import com.learning.english.dao.SigninRequest;
 import com.learning.english.models.Role;
 import com.learning.english.models.User;
 import com.learning.english.repository.UserRepository;
-import com.learning.english.security.UserAlreadyExistsException;
+import com.learning.english.exception.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
