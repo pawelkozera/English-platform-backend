@@ -30,6 +30,7 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain homepageFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher("/")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
