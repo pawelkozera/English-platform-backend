@@ -31,6 +31,17 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "userInfo")
     private RefreshToken refreshToken;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_group",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id")
+    )
+    private List<Group> groups;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<Review> reviews;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

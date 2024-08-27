@@ -1,2 +1,39 @@
-package com.learning.english.models;public class Word {
+package com.learning.english.models;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "word")
+public class Word {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String word;
+    private String translation;
+
+    @ManyToMany
+    @JoinTable(
+            name = "lesson_word",
+            joinColumns = @JoinColumn(name = "word_id"),
+            inverseJoinColumns = @JoinColumn(name = "lesson_id")
+    )
+    private List<Lesson> lessons;
+
+    @ManyToMany
+    @JoinTable(
+            name = "review_word",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "word_id")
+    )
+    private List<Word> words;
 }
