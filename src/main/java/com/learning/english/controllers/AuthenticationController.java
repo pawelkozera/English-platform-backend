@@ -4,6 +4,7 @@ import com.learning.english.dao.JwtAuthenticationResponse;
 import com.learning.english.dao.SignUpRequest;
 import com.learning.english.dao.SigninRequest;
 import com.learning.english.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +20,16 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpRequest request) {
-        return ResponseEntity.ok(authenticationService.signup(request));
+        return authenticationService.signup(request);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody SigninRequest request) {
-        return ResponseEntity.ok(authenticationService.signin(request));
+        return authenticationService.signin(request);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        return authenticationService.logout(response);
     }
 }

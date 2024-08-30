@@ -1,12 +1,13 @@
 package com.learning.english.service;
 
-import com.learning.english.dao.JwtAuthenticationResponse;
 import com.learning.english.dao.SignUpRequest;
 import com.learning.english.dao.SigninRequest;
 import com.learning.english.models.Role;
 import com.learning.english.models.User;
 import com.learning.english.repository.UserRepository;
 import com.learning.english.exception.UserAlreadyExistsException;
+import com.learning.english.utils.TokenCookies;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -43,21 +44,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String jwt = jwtService.generateToken(user);
         String refreshToken = refreshTokenService.createOrUpdateRefreshToken(user.getEmail()).getToken();
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt)
-                .httpOnly(true)
-                .secure(false) // true when in production
-                .path("/")
-                .maxAge(60 * 24)
-                .sameSite("Strict")
-                .build();
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(false) // true when in production
-                .path("/api/v1/auth/refreshToken")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Strict")
-                .build();
+        ResponseCookie accessTokenCookie = TokenCookies.createAccessTokenCookie(jwt);
+        ResponseCookie refreshTokenCookie = TokenCookies.createRefreshTokenCookie(refreshToken);
 
         return ResponseEntity.ok()
                 .header("Set-Cookie", accessTokenCookie.toString())
@@ -75,21 +63,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             );
             String jwt = jwtService.generateToken(user);
 
-            ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", jwt)
-                    .httpOnly(true)
-                    .secure(false) // true when in production
-                    .path("/")
-                    .maxAge(60 * 60)
-                    .sameSite("Strict")
-                    .build();
-
-            ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                    .httpOnly(true)
-                    .secure(false) // true when in production
-                    .path("/api/v1/auth/refreshToken")
-                    .maxAge(7 * 24 * 60 * 60)
-                    .sameSite("Strict")
-                    .build();
+            ResponseCookie accessTokenCookie = TokenCookies.createAccessTokenCookie(jwt);
+            ResponseCookie refreshTokenCookie = TokenCookies.createRefreshTokenCookie(refreshToken);
 
             return ResponseEntity.ok()
                     .header("Set-Cookie", accessTokenCookie.toString())
@@ -98,5 +73,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         throw new UsernameNotFoundException("Invalid user request");
+    }
+
+    @Override
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        TokenCookies.remove(response);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 }

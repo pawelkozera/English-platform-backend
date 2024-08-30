@@ -2,6 +2,7 @@ package com.learning.english.security;
 
 import com.learning.english.service.JwtService;
 import com.learning.english.service.UserService;
+import com.learning.english.utils.TokenCookies;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -68,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (JwtException | UsernameNotFoundException e) {
+            TokenCookies.remove(response);
             SecurityContextHolder.clearContext();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
