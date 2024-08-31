@@ -5,7 +5,11 @@ import com.learning.english.dao.RefreshTokenRequest;
 import com.learning.english.models.RefreshToken;
 import com.learning.english.service.JwtService;
 import com.learning.english.service.RefreshTokenService;
+import com.learning.english.utils.TokenCookies;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.Token;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,15 +23,17 @@ public class RefreshTokenController {
     private final JwtService jwtService;
 
     @PostMapping("/refreshToken")
-    public JwtAuthenticationResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        return refreshTokenService.findByToken(refreshTokenRequest.getRefreshToken())
+    public JwtAuthenticationResponse refreshToken(HttpServletRequest request) {
+        String refreshToken = TokenCookies.extractRefreshToken(request);
+
+        return refreshTokenService.findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUserInfo)
                 .map(userInfo -> {
                     String accessToken = jwtService.generateToken(userInfo);
                     return JwtAuthenticationResponse.builder()
                             .accessToken(accessToken)
-                            .refreshToken(refreshTokenRequest.getRefreshToken()).build();
-                }).orElseThrow(() ->new RuntimeException("Refresh Token is not in DB."));
+                            .refreshToken(refreshToken).build();
+                }).orElseThrow(() -> new RuntimeException("Refresh Token is not in DB."));
     }
 }

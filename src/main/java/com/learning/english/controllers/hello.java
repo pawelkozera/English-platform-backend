@@ -12,13 +12,6 @@ import java.util.Collection;
 public class hello {
     @GetMapping("/hello")
     public String hello(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            for (GrantedAuthority authority : authorities) {
-                System.out.println("Role: " + authority.getAuthority());
-            }
-        }
         return "hello";
     }
 }

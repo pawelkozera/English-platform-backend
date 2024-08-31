@@ -1,6 +1,7 @@
 package com.learning.english.utils;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import org.springframework.http.ResponseCookie;
@@ -41,5 +42,16 @@ public class TokenCookies {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
+    }
+
+    public static String extractRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        throw new RuntimeException("Refresh token not found in cookies.");
     }
 }
