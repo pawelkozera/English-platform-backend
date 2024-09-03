@@ -46,7 +46,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.
                         requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/hello").hasAuthority("USER")
+                        .requestMatchers(
+                                "/hello",
+                                "/api/v1/user/profile"
+                        ).hasAuthority("USER")
                         .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(

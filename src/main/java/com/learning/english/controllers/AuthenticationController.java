@@ -1,6 +1,5 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dao.JwtAuthenticationResponse;
 import com.learning.english.dao.SignUpRequest;
 import com.learning.english.dao.SigninRequest;
 import com.learning.english.service.AuthenticationService;
