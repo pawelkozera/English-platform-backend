@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,10 +20,13 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String groupName;
+    private String password;
 
     @ManyToMany(mappedBy = "groups")
-    private List<User> students;
+    @Builder.Default
+    private List<User> students = new ArrayList<>();
 
     @ManyToMany(mappedBy = "groups")
-    private List<Lesson> lessons;
+    @Builder.Default
+    private List<Lesson> lessons = new ArrayList<>();
 }

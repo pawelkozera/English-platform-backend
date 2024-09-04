@@ -4,7 +4,7 @@ import com.learning.english.models.RefreshToken;
 import com.learning.english.models.User;
 import com.learning.english.repository.RefreshTokenRepository;
 import com.learning.english.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +13,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
-    @Autowired
-    RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
     public RefreshToken createOrUpdateRefreshToken(String username) {
         Optional<User> userOptional = userRepository.findByEmail(username);

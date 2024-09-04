@@ -54,4 +54,15 @@ public class TokenCookies {
         }
         throw new RuntimeException("Refresh token not found in cookies.");
     }
+
+    public static String extractAccessToken(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        throw new RuntimeException("Access token not found in cookies.");
+    }
 }

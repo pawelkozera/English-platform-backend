@@ -3,7 +3,7 @@ package com.learning.english.controllers;
 import com.learning.english.dao.UserProfileResponse;
 import com.learning.english.service.JwtService;
 import com.learning.english.service.UserService;
-import jakarta.servlet.http.Cookie;
+import com.learning.english.utils.TokenCookies;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,22 +19,8 @@ public class UserController {
 
     @GetMapping("/profile")
     public UserProfileResponse getProfile(HttpServletRequest request) {
-        String jwtToken = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    jwtToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        if (jwtToken != null) {
-            String email = jwtService.extractUserName(jwtToken);
-
-            return userService.getUserProfileByEmail(email);
-        } else {
-            throw new RuntimeException("Token not found");
-        }
+        String jwtToken = TokenCookies.extractAccessToken(request);
+        String email = jwtService.extractUserName(jwtToken);
+        return userService.getUserProfileByEmail(email);
     }
 }
