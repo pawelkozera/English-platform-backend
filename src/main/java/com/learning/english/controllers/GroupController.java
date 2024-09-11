@@ -1,6 +1,7 @@
 package com.learning.english.controllers;
 
 import com.learning.english.dao.GroupCreateRequest;
+import com.learning.english.dao.GroupJoinRequest;
 import com.learning.english.models.User;
 import com.learning.english.service.GroupService;
 import com.learning.english.service.JwtService;
@@ -32,5 +33,23 @@ public class GroupController {
         groupService.createGroup(groupCreateRequest, user);
 
         return ResponseEntity.ok("Group created successfully");
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<String> joinGroup(HttpServletRequest request, @RequestBody GroupJoinRequest groupRequest) {
+        String jwtToken = TokenCookies.extractAccessToken(request);
+        String email = jwtService.extractUserName(jwtToken);
+
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        try {
+            groupService.joinGroup(user, groupRequest);
+            return ResponseEntity.ok("User successfully joined the group.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 }

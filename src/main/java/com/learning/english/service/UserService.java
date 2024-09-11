@@ -44,7 +44,11 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return userGroupRepository.findByUser(user).stream()
-                .map(userGroup -> new GroupResponse(userGroup.getGroup().getId(), userGroup.getGroup().getGroupName()))
+                .map(userGroup -> GroupResponse.builder()
+                        .id(userGroup.getGroup().getId())
+                        .groupName(userGroup.getGroup().getGroupName())
+                        .groupCode(userGroup.getGroup().getGroupCode())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +57,12 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return userGroupRepository.findByUserAndIsOwnerTrue(user).stream()
-                .map(userGroup -> new GroupResponse(userGroup.getGroup().getId(), userGroup.getGroup().getGroupName()))
+                .map(userGroup -> GroupResponse.builder()
+                        .id(userGroup.getGroup().getId())
+                        .groupName(userGroup.getGroup().getGroupName())
+                        .groupCode(userGroup.getGroup().getGroupCode())
+                        .build())
                 .collect(Collectors.toList());
     }
+
 }

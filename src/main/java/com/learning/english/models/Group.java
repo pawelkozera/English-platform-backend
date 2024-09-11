@@ -22,6 +22,9 @@ public class Group {
     private String groupName;
     private String password;
 
+    @Column(unique = true)
+    private String groupCode;
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<UserGroup> userGroups;
 

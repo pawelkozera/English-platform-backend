@@ -47,8 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.
                         requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(
-                                "/hello",
-                                "/api/v1/user/profile"
+                                "/api/v1/user/**",
+                                "/api/v1/group/**"
                         ).hasAuthority("USER")
                         .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
