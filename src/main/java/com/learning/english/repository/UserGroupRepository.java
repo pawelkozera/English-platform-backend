@@ -12,6 +12,5 @@ import java.util.Optional;
 @Repository
 public interface UserGroupRepository extends CrudRepository<UserGroup, Integer> {
     List<UserGroup> findByUser(User user);
-    List<UserGroup> findByUserAndIsOwnerTrue(User user);
     Optional<UserGroup> findByUserAndGroup(User user, Group group);
 }

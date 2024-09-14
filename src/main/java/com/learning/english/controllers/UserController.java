@@ -33,11 +33,4 @@ public class UserController {
         String email = jwtService.extractUserName(jwtToken);
         return userService.getAllUserGroups(email);
     }
-
-    @GetMapping("/ownedGroups")
-    public List<GroupResponse> getOwnedUserGroups(HttpServletRequest request) {
-        String jwtToken = TokenCookies.extractAccessToken(request);
-        String email = jwtService.extractUserName(jwtToken);
-        return userService.getOwnedUserGroups(email);
-    }
 }

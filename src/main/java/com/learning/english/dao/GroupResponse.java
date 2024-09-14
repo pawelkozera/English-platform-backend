@@ -13,5 +13,6 @@ public class GroupResponse {
     private Integer id;
     private String groupName;
     private String groupCode;
+    private boolean isOwner;
 }
 

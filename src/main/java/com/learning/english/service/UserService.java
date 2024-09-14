@@ -48,21 +48,8 @@ public class UserService {
                         .id(userGroup.getGroup().getId())
                         .groupName(userGroup.getGroup().getGroupName())
                         .groupCode(userGroup.getGroup().getGroupCode())
+                        .isOwner(userGroup.isOwner())
                         .build())
                 .collect(Collectors.toList());
     }
-
-    public List<GroupResponse> getOwnedUserGroups(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        return userGroupRepository.findByUserAndIsOwnerTrue(user).stream()
-                .map(userGroup -> GroupResponse.builder()
-                        .id(userGroup.getGroup().getId())
-                        .groupName(userGroup.getGroup().getGroupName())
-                        .groupCode(userGroup.getGroup().getGroupCode())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
 }
