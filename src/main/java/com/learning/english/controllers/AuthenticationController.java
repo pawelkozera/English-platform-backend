@@ -1,7 +1,7 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dao.SignUpRequest;
-import com.learning.english.dao.SigninRequest;
+import com.learning.english.dto.SignUpRequest;
+import com.learning.english.dto.SigninRequest;
 import com.learning.english.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

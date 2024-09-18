@@ -1,13 +1,15 @@
-package com.learning.english.dao;
+package com.learning.english.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class GroupJoinRequest {
-    private String groupCode;
+@AllArgsConstructor
+public class SigninRequest {
+    private String email;
     private String password;
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -26,8 +27,6 @@ public class Lesson {
             joinColumns = @JoinColumn(name = "lesson_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
-    private List<Group> groups;
-
-    @ManyToMany(mappedBy = "lessons")
-    private List<Word> words;
+    @Builder.Default
+    private List<Group> groups = new ArrayList<>();
 }

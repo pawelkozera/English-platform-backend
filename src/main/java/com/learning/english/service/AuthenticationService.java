@@ -1,7 +1,7 @@
 package com.learning.english.service;
 
-import com.learning.english.dao.SignUpRequest;
-import com.learning.english.dao.SigninRequest;
+import com.learning.english.dto.SignUpRequest;
+import com.learning.english.dto.SigninRequest;
 import com.learning.english.models.Role;
 import com.learning.english.models.User;
 import com.learning.english.repository.UserRepository;

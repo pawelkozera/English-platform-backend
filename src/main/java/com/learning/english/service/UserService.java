@@ -1,7 +1,7 @@
 package com.learning.english.service;
 
-import com.learning.english.dao.GroupResponse;
-import com.learning.english.dao.UserProfileResponse;
+import com.learning.english.dto.GroupResponse;
+import com.learning.english.dto.UserProfileResponse;
 import com.learning.english.models.User;
 import com.learning.english.repository.UserGroupRepository;
 import com.learning.english.repository.UserRepository;

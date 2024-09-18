@@ -1,4 +1,4 @@
-package com.learning.english.dao;
+package com.learning.english.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtAuthenticationResponse {
-    private String accessToken;
-    private String refreshToken;
+public class UserProfileResponse {
+    private String email;
+    private String firstName;
+    private String lastName;
 }

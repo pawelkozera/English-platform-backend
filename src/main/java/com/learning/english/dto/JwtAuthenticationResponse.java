@@ -1,4 +1,4 @@
-package com.learning.english.dao;
+package com.learning.english.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupCreateRequest {
-    private String groupName;
-    private String password;
+public class JwtAuthenticationResponse {
+    private String accessToken;
+    private String refreshToken;
 }

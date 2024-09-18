@@ -1,6 +1,6 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dao.JwtAuthenticationResponse;
+import com.learning.english.dto.JwtAuthenticationResponse;
 import com.learning.english.models.RefreshToken;
 import com.learning.english.service.JwtService;
 import com.learning.english.service.RefreshTokenService;

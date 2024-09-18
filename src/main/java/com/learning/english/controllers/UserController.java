@@ -1,7 +1,7 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dao.GroupResponse;
-import com.learning.english.dao.UserProfileResponse;
+import com.learning.english.dto.GroupResponse;
+import com.learning.english.dto.UserProfileResponse;
 import com.learning.english.service.JwtService;
 import com.learning.english.service.UserService;
 import com.learning.english.utils.TokenCookies;

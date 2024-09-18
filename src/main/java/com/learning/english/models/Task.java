@@ -13,22 +13,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "word")
-public class Word {
+@Table(name = "task")
+public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String word;
-    private String translation;
+
+    @ManyToOne
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
+
+    @ManyToOne
+    @JoinColumn(name = "task_type_id", nullable = false)
+    private TaskType taskType;
+
+    private String content;
+
+    private String correctAnswer;
 
     @ManyToMany
     @JoinTable(
-            name = "review_word",
-            joinColumns = @JoinColumn(name = "review_id"),
+            name = "task_word",
+            joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "word_id")
     )
     private List<Word> words;
-
-    @ManyToMany(mappedBy = "words")
-    private List<Task> tasks;
 }

@@ -1,7 +1,7 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dao.GroupCreateRequest;
-import com.learning.english.dao.GroupJoinRequest;
+import com.learning.english.dto.GroupCreateRequest;
+import com.learning.english.dto.GroupJoinRequest;
 import com.learning.english.models.User;
 import com.learning.english.service.GroupService;
 import com.learning.english.service.JwtService;

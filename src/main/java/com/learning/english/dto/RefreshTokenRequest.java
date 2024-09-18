@@ -1,4 +1,4 @@
-package com.learning.english.dao;
+package com.learning.english.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,13 +1,12 @@
 package com.learning.english.service;
 
-import com.learning.english.dao.GroupCreateRequest;
-import com.learning.english.dao.GroupJoinRequest;
+import com.learning.english.dto.GroupCreateRequest;
+import com.learning.english.dto.GroupJoinRequest;
 import com.learning.english.models.Group;
 import com.learning.english.models.User;
 import com.learning.english.models.UserGroup;
 import com.learning.english.repository.GroupRepository;
 import com.learning.english.repository.UserGroupRepository;
-import com.learning.english.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;

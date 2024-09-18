@@ -2,6 +2,12 @@ spring:
   application:
     name: english
 
+  datasource:
+    url: jdbc:h2:mem:spring-security
+    driver-class-name: org.h2.Driver
+    username: root
+    password: 12345
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -10,11 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    datasource:
-      url: jdbc:h2:mem:spring-security
-      driver-class-name: org.h2.Driver
-      username: root
-      password: 12345
 
   web:
     resources:

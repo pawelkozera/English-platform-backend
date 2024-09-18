@@ -1,4 +1,4 @@
-package com.learning.english.dao;
+package com.learning.english.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfileResponse {
-    private String email;
-    private String firstName;
-    private String lastName;
+public class LessonAddRequest {
+    private String title;
+    private Integer groupId;
 }
