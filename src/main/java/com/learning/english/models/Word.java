@@ -27,7 +27,7 @@ public class Word {
             joinColumns = @JoinColumn(name = "review_id"),
             inverseJoinColumns = @JoinColumn(name = "word_id")
     )
-    private List<Word> words;
+    private List<Review> reviews;
 
     @ManyToMany(mappedBy = "words")
     private List<Task> tasks;

@@ -1,6 +1,7 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.LessonAddRequest;
+import com.learning.english.dto.LessonResponse;
 import com.learning.english.models.Group;
 import com.learning.english.models.Lesson;
 import com.learning.english.models.User;
@@ -9,6 +10,9 @@ import com.learning.english.repository.LessonRepository;
 import com.learning.english.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +45,24 @@ public class LessonService {
         lesson.getGroups().add(group);
 
         lessonRepository.save(lesson);
+    }
+
+    public List<LessonResponse> getLessonsFromGroup(User user, Integer groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+
+        boolean isMember = userGroupRepository.existsByUserAndGroup(user, group);
+        if (!isMember) {
+            throw new IllegalArgumentException("User is not a member of the group");
+        }
+
+        List<Lesson> lessons = lessonRepository.findAllByGroupsContaining(group);
+
+        return lessons.stream()
+                .map(lesson -> LessonResponse.builder()
+                        .lessonId(lesson.getId())
+                        .title(lesson.getTitle())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

@@ -1,9 +1,13 @@
 package com.learning.english.repository;
 
+import com.learning.english.models.Group;
 import com.learning.english.models.Lesson;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LessonRepository extends CrudRepository<Lesson, Integer> {
+    List<Lesson> findAllByGroupsContaining(Group group);
 }

@@ -14,4 +14,5 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
     List<UserGroup> findByUser(User user);
     Optional<UserGroup> findByUserAndGroup(User user, Group group);
     boolean existsByUserAndGroupAndIsOwnerTrue(User user, Group group);
+    boolean existsByUserAndGroup(User user, Group group);
 }

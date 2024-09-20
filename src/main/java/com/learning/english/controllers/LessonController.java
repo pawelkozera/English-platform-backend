@@ -1,7 +1,8 @@
 package com.learning.english.controllers;
 
 import com.learning.english.dto.LessonAddRequest;
-import com.learning.english.dto.TaskAddRequest;
+import com.learning.english.dto.LessonResponse;
+import com.learning.english.models.Lesson;
 import com.learning.english.models.User;
 import com.learning.english.service.JwtService;
 import com.learning.english.service.LessonService;
@@ -10,10 +11,9 @@ import com.learning.english.utils.TokenCookies;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/lesson")
@@ -36,5 +36,17 @@ public class LessonController {
         lessonService.addLesson(lessonAddRequest, user);
 
         return ResponseEntity.ok("Task created successfully");
+    }
+
+    @GetMapping("all/from/group/{groupId}")
+    public List<LessonResponse> getLessonsFromGroup(HttpServletRequest request, @PathVariable Integer groupId) {
+        String jwtToken = TokenCookies.extractAccessToken(request);
+        String email = jwtService.extractUserName(jwtToken);
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        return lessonService.getLessonsFromGroup(user, groupId);
     }
 }
