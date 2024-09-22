@@ -24,10 +24,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public UserProfileResponse getUserProfileByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public UserProfileResponse getUserProfileByEmail(User user) {
         return UserProfileResponse.builder()
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
@@ -39,10 +36,7 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public List<GroupResponse> getAllUserGroups(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public List<GroupResponse> getAllUserGroups(User user) {
         return userGroupRepository.findByUser(user).stream()
                 .map(userGroup -> GroupResponse.builder()
                         .id(userGroup.getGroup().getId())

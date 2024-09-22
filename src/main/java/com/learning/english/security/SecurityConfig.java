@@ -51,7 +51,8 @@ public class SecurityConfig {
                                 "/api/v1/user/**",
                                 "/api/v1/group/**",
                                 "/api/v1/task/**",
-                                "/api/v1/lesson/**"
+                                "/api/v1/lesson/**",
+                                "/api/v1/word/**"
                         ).hasAuthority("USER")
                         .anyRequest().permitAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

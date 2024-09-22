@@ -21,6 +21,10 @@ public class Word {
     private String word;
     private String translation;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
     @ManyToMany
     @JoinTable(
             name = "review_word",

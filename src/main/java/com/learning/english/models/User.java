@@ -34,6 +34,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserGroup> userGroups;
 
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private List<Word> createdWords;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<Review> reviews;
 

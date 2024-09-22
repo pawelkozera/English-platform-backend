@@ -2,9 +2,9 @@ package com.learning.english.controllers;
 
 import com.learning.english.dto.GroupResponse;
 import com.learning.english.dto.UserProfileResponse;
-import com.learning.english.service.JwtService;
+import com.learning.english.models.User;
 import com.learning.english.service.UserService;
-import com.learning.english.utils.TokenCookies;
+import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,19 +18,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final JwtService jwtService;
+    private final AuthUtil authUtil;
 
     @GetMapping("/profile")
     public UserProfileResponse getProfile(HttpServletRequest request) {
-        String jwtToken = TokenCookies.extractAccessToken(request);
-        String email = jwtService.extractUserName(jwtToken);
-        return userService.getUserProfileByEmail(email);
+        User user = authUtil.getAuthenticatedUser(request);
+        return userService.getUserProfileByEmail(user);
     }
 
     @GetMapping("/allGroups")
     public List<GroupResponse> getAllUserGroups(HttpServletRequest request) {
-        String jwtToken = TokenCookies.extractAccessToken(request);
-        String email = jwtService.extractUserName(jwtToken);
-        return userService.getAllUserGroups(email);
+        User user = authUtil.getAuthenticatedUser(request);
+        return userService.getAllUserGroups(user);
     }
 }
