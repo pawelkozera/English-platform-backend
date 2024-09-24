@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 public class WordService {
     private final WordRepository wordRepository;
 
-    public void addTask(WordAddRequest wordAddRequest, User user) {
+    public void addWord(WordAddRequest wordAddRequest, User user) {
         Word word = Word.builder()
                 .word(wordAddRequest.getWord())
                 .translation(wordAddRequest.getTranslation())
+                .audioFilePath(wordAddRequest.getAudioFilePath())
+                .imageFilePath(wordAddRequest.getImageFilePath())
                 .createdBy(user)
                 .build();
 

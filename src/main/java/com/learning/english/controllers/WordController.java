@@ -7,10 +7,13 @@ import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/v1/word")
@@ -20,9 +23,45 @@ public class WordController {
     private final AuthUtil authUtil;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addWord(HttpServletRequest request, @RequestBody WordAddRequest wordAddRequest) {
+    public ResponseEntity<String> addWord(HttpServletRequest request,
+                                          @ModelAttribute("wordAddRequest") WordAddRequest wordAddRequest,
+                                          @RequestPart(value = "audioFile", required = false) MultipartFile audioFile,
+                                          @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
         User user = authUtil.getAuthenticatedUser(request);
-        wordService.addTask(wordAddRequest, user);
+
+        String audioFilePath = null;
+        String imageFilePath = null;
+
+        if (audioFile != null && !audioFile.isEmpty()) {
+            audioFilePath = saveFile(audioFile, "audio");
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageFilePath = saveFile(imageFile, "images");
+        }
+
+        wordAddRequest.setAudioFilePath(audioFilePath);
+        wordAddRequest.setImageFilePath(imageFilePath);
+
+        wordService.addWord(wordAddRequest, user);
+
         return ResponseEntity.ok("Word created successfully");
+    }
+
+    private String saveFile(MultipartFile file, String folder) throws IOException {
+        String uploadDir = "uploads/" + folder + "/";
+        Path uploadPath = Paths.get(uploadDir);
+
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String filePath = uploadDir + System.currentTimeMillis() + "_" + originalFilename;
+        Path path = Paths.get(filePath);
+        Files.write(path, file.getBytes());
+
+        return filePath;
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WordAddRequest {
+public class WordResponse {
     private String word;
     private String translation;
     private String audioFilePath;

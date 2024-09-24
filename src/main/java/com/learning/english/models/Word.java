@@ -20,6 +20,8 @@ public class Word {
     private Integer id;
     private String word;
     private String translation;
+    private String audioFilePath;
+    private String imageFilePath;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
