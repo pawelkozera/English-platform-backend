@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "task_type")
-public class TaskType {
+@Table(name = "task_subtype")
+public class TaskSubType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String typeName;
+    private String subTypeName;
 }

@@ -1,14 +1,8 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.TaskAddRequest;
-import com.learning.english.models.Lesson;
-import com.learning.english.models.Task;
-import com.learning.english.models.TaskType;
-import com.learning.english.models.User;
-import com.learning.english.repository.LessonRepository;
-import com.learning.english.repository.TaskRepository;
-import com.learning.english.repository.TaskTypeRepository;
-import com.learning.english.repository.UserGroupRepository;
+import com.learning.english.models.*;
+import com.learning.english.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +11,16 @@ import org.springframework.stereotype.Service;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskTypeRepository taskTypeRepository;
+    private final TaskSubTypeRepository taskSubTypeRepository;
     private final LessonRepository lessonRepository;
     private final UserGroupRepository userGroupRepository;
 
     public void addTask(TaskAddRequest taskAddRequest, User user) {
         TaskType taskType = taskTypeRepository.findByTypeName(taskAddRequest.getTaskTypeName())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid task type"));
+
+        TaskSubType taskSubType = taskSubTypeRepository.findBySubTypeName(taskAddRequest.getTaskSubTypeName())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid task sub type"));
 
         Lesson lesson = lessonRepository.findById(taskAddRequest.getLessonId())
                 .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
@@ -36,6 +34,7 @@ public class TaskService {
 
         Task task = Task.builder()
                 .taskType(taskType)
+                .taskSubType(taskSubType)
                 .content(taskAddRequest.getContent())
                 .correctAnswer(taskAddRequest.getCorrectAnswer())
                 .lesson(lesson)

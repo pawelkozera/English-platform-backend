@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TaskAddRequest {
     private String taskTypeName;
+    private String taskSubTypeName;
     private String content;
     private String correctAnswer;
     private Integer lessonId;

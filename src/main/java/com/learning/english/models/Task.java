@@ -27,6 +27,10 @@ public class Task {
     @JoinColumn(name = "task_type_id", nullable = false)
     private TaskType taskType;
 
+    @ManyToOne
+    @JoinColumn(name = "task_subtype_id", nullable = false)
+    private TaskSubType taskSubType;
+
     private String content;
 
     private String correctAnswer;
