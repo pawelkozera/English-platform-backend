@@ -1,6 +1,5 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dto.LessonResponse;
 import com.learning.english.dto.WordAddRequest;
 import com.learning.english.dto.WordResponse;
 import com.learning.english.models.User;
@@ -8,6 +7,7 @@ import com.learning.english.service.WordService;
 import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/word")
@@ -26,9 +25,13 @@ public class WordController {
     private final AuthUtil authUtil;
 
     @GetMapping("/all/owned/by/user")
-    public List<WordResponse> getWordsOwnedByUser(HttpServletRequest request) {
+    public Page<WordResponse> getWordsOwnedByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request
+    ) {
         User user = authUtil.getAuthenticatedUser(request);
-        return wordService.getWordsOwnedByUser(user);
+        return wordService.getWordsOwnedByUser(user, page, size);
     }
 
     @PostMapping("/add")
