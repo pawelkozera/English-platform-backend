@@ -6,6 +6,10 @@ import com.learning.english.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -14,6 +18,7 @@ public class TaskService {
     private final TaskSubTypeRepository taskSubTypeRepository;
     private final LessonRepository lessonRepository;
     private final UserGroupRepository userGroupRepository;
+    private final WordRepository wordRepository;
 
     public void addTask(TaskAddRequest taskAddRequest, User user) {
         TaskType taskType = taskTypeRepository.findByTypeName(taskAddRequest.getTaskTypeName())
@@ -32,12 +37,16 @@ public class TaskService {
             throw new IllegalArgumentException("User is not the owner of any group associated with the lesson");
         }
 
+        List<Word> words = StreamSupport.stream(wordRepository.findAllById(taskAddRequest.getWordIds()).spliterator(), false)
+                .collect(Collectors.toList());
+
         Task task = Task.builder()
                 .taskType(taskType)
                 .taskSubType(taskSubType)
                 .content(taskAddRequest.getContent())
                 .correctAnswer(taskAddRequest.getCorrectAnswer())
                 .lesson(lesson)
+                .words(words)
                 .build();
 
         taskRepository.save(task);

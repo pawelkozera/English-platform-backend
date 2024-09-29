@@ -8,6 +8,10 @@ import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,14 +28,28 @@ public class WordController {
     private final WordService wordService;
     private final AuthUtil authUtil;
 
+
     @GetMapping("/all/owned/by/user")
-    public Page<WordResponse> getWordsOwnedByUser(
+    public ResponseEntity<PagedModel<WordResponse>> getWordsOwnedByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            HttpServletRequest request
+            HttpServletRequest request,
+            PagedResourcesAssembler<WordResponse> assembler
     ) {
         User user = authUtil.getAuthenticatedUser(request);
-        return wordService.getWordsOwnedByUser(user, page, size);
+        Page<WordResponse> wordPage = wordService.getWordsOwnedByUser(user, page, size);
+
+        PagedModel<EntityModel<WordResponse>> pagedModel = assembler.toModel(wordPage, wordResponse ->
+                EntityModel.of(wordResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(WordController.class).getWordsOwnedByUser(page, size, request, assembler)).withSelfRel())
+        );
+
+        PagedModel<WordResponse> result = PagedModel.of(
+                wordPage.getContent(),
+                pagedModel.getMetadata()
+        );
+
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/add")
