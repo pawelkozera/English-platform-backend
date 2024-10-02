@@ -1,6 +1,7 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.TaskAddRequest;
+import com.learning.english.dto.TaskCompleteRequest;
 import com.learning.english.dto.TaskResponse;
 import com.learning.english.dto.WordResponse;
 import com.learning.english.exception.TaskNotFoundException;
@@ -25,6 +26,8 @@ public class TaskService {
     private final UserGroupRepository userGroupRepository;
     private final WordRepository wordRepository;
     private final GroupRepository groupRepository;
+    private final LessonProgressRepository lessonProgressRepository;
+    private final TaskProgressRepository taskProgressRepository;
 
     public void addTask(TaskAddRequest taskAddRequest, User user) {
         TaskType taskType = taskTypeRepository.findByTypeName(taskAddRequest.getTaskTypeName())
@@ -59,7 +62,8 @@ public class TaskService {
     }
 
     public TaskResponse getTaskById(User user, Integer taskId) {
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found"));
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
 
         Lesson lesson = task.getLesson();
         boolean userInGroup = lesson.getGroups().stream()
@@ -67,6 +71,15 @@ public class TaskService {
 
         if (!userInGroup) {
             throw new AccessDeniedException("User does not belong to any group for this task's lesson");
+        }
+
+        LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLessonId(user, lesson.getId());
+        boolean isCompleted = false;
+        if (lessonProgress != null) {
+            TaskProgress taskProgress = taskProgressRepository.findByLessonProgressAndTaskId(lessonProgress, taskId);
+            if (taskProgress != null) {
+                isCompleted = taskProgress.isCompleted();
+            }
         }
 
         return TaskResponse.builder()
@@ -84,6 +97,7 @@ public class TaskService {
                                 .imageFilePath(word.getImageFilePath())
                                 .build())
                         .collect(Collectors.toList()))
+                .completed(isCompleted)
                 .build();
     }
 
@@ -91,30 +105,58 @@ public class TaskService {
         List<Task> tasks = new ArrayList<>();
         taskRepository.findAllById(taskIds).forEach(tasks::add);
 
-        List<TaskResponse> taskResponses = tasks.stream()
+        return tasks.stream()
                 .filter(task -> {
                     Lesson lesson = task.getLesson();
                     return lesson.getGroups().stream()
                             .anyMatch(group -> groupRepository.existsByGroupIdAndUserId(group.getId(), user.getId()));
                 })
-                .map(task -> TaskResponse.builder()
-                        .id(task.getId())
-                        .taskTypeName(task.getTaskType().getTypeName())
-                        .taskSubTypeName(task.getTaskSubType().getSubTypeName())
-                        .content(task.getContent())
-                        .correctAnswer(task.getCorrectAnswer())
-                        .words(task.getWords().stream()
-                                .map(word -> WordResponse.builder()
-                                        .id(word.getId())
-                                        .word(word.getWord())
-                                        .translation(word.getTranslation())
-                                        .audioFilePath(word.getAudioFilePath())
-                                        .imageFilePath(word.getImageFilePath())
-                                        .build())
-                                .collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
+                .map(task -> {
+                    LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLessonId(user, task.getLesson().getId());
+                    boolean isCompleted = false;
+                    if (lessonProgress != null) {
+                        TaskProgress taskProgress = taskProgressRepository.findByLessonProgressAndTaskId(lessonProgress, task.getId());
+                        if (taskProgress != null) {
+                            isCompleted = taskProgress.isCompleted();
+                        }
+                    }
 
-        return taskResponses;
+                    return TaskResponse.builder()
+                            .id(task.getId())
+                            .taskTypeName(task.getTaskType().getTypeName())
+                            .taskSubTypeName(task.getTaskSubType().getSubTypeName())
+                            .content(task.getContent())
+                            .correctAnswer(task.getCorrectAnswer())
+                            .words(task.getWords().stream()
+                                    .map(word -> WordResponse.builder()
+                                            .id(word.getId())
+                                            .word(word.getWord())
+                                            .translation(word.getTranslation())
+                                            .audioFilePath(word.getAudioFilePath())
+                                            .imageFilePath(word.getImageFilePath())
+                                            .build())
+                                    .collect(Collectors.toList()))
+                            .completed(isCompleted)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void completeTask(User user, TaskCompleteRequest taskCompleteRequest) {
+        Integer lessonId = taskCompleteRequest.getLessonId();
+        LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLessonId(user, lessonId);
+        if (lessonProgress != null) {
+            Integer taskId = taskCompleteRequest.getTaskId();
+            TaskProgress taskProgress = taskProgressRepository.findByLessonProgressAndTaskId(lessonProgress, taskId);
+            if (taskProgress != null) {
+                taskProgress.setCompleted(true);
+                taskProgressRepository.save(taskProgress);
+
+                if (lessonProgress.getCompletedTaskCount() == lessonProgress.getTaskProgresses().size()) {
+                    lessonProgress.setCompleted(true);
+                    lessonProgressRepository.save(lessonProgress);
+                }
+            }
         }
+    }
 }

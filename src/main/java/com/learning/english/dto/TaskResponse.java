@@ -17,5 +17,6 @@ public class TaskResponse {
     private String taskSubTypeName;
     private String content;
     private String correctAnswer;
+    private boolean completed;
     private List<WordResponse> words;
 }

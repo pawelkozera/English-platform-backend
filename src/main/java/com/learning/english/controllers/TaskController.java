@@ -1,6 +1,8 @@
 package com.learning.english.controllers;
 
+import com.learning.english.dto.LessonAddRequest;
 import com.learning.english.dto.TaskAddRequest;
+import com.learning.english.dto.TaskCompleteRequest;
 import com.learning.english.dto.TaskResponse;
 import com.learning.english.models.User;
 import com.learning.english.service.TaskService;
@@ -34,10 +36,17 @@ public class TaskController {
     }
 
     @GetMapping("/batch")
-    public ResponseEntity<List<TaskResponse>> getTasksByIds(@RequestParam List<Integer> taskIds, HttpServletRequest request) {
+    public ResponseEntity<List<TaskResponse>> getTasksByIds(HttpServletRequest request, @RequestParam List<Integer> taskIds) {
         User user = authUtil.getAuthenticatedUser(request);
         List<TaskResponse> tasks = taskService.getTasksByIds(user, taskIds);
         return ResponseEntity.ok(tasks);
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<Void> completeTask(HttpServletRequest request, @RequestBody TaskCompleteRequest taskCompleteRequest) {
+        User user = authUtil.getAuthenticatedUser(request);
+        taskService.completeTask(user, taskCompleteRequest);
+        return ResponseEntity.ok().build();
     }
 }
 
