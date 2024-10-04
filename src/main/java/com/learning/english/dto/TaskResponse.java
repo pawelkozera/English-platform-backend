@@ -19,4 +19,5 @@ public class TaskResponse {
     private String correctAnswer;
     private boolean completed;
     private List<WordResponse> words;
+    private Integer score;
 }

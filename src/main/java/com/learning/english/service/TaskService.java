@@ -59,6 +59,7 @@ public class TaskService {
                 .lesson(lesson)
                 .words(words)
                 .owner(user)
+                .score(taskAddRequest.getScore())
                 .build();
 
         taskRepository.save(task);
@@ -140,6 +141,7 @@ public class TaskService {
                                             .build())
                                     .collect(Collectors.toList()))
                             .completed(isCompleted)
+                            .score(task.getScore())
                             .build();
                 })
                 .collect(Collectors.toList());

@@ -18,4 +18,5 @@ public class TaskAddRequest {
     private String correctAnswer;
     private Integer lessonId;
     private List<Integer> wordIds;
+    private Integer score;
 }
