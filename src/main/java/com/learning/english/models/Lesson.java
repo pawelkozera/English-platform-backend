@@ -29,4 +29,8 @@ public class Lesson {
     )
     @Builder.Default
     private List<Group> groups = new ArrayList<>();
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Task> tasks = new ArrayList<>();
 }

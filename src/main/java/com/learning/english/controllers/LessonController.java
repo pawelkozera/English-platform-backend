@@ -2,11 +2,18 @@ package com.learning.english.controllers;
 
 import com.learning.english.dto.LessonAddRequest;
 import com.learning.english.dto.LessonResponse;
+import com.learning.english.dto.LessonsDisplayResponse;
+import com.learning.english.dto.WordResponse;
 import com.learning.english.models.User;
 import com.learning.english.service.LessonService;
 import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +37,28 @@ public class LessonController {
     public List<LessonResponse> getLessonsFromGroup(HttpServletRequest request, @PathVariable Integer groupId) {
         User user = authUtil.getAuthenticatedUser(request);
         return lessonService.getLessonsFromGroup(user, groupId);
+    }
+
+    @GetMapping("all/for/display")
+    public ResponseEntity<PagedModel<LessonsDisplayResponse>> getLessonsForDisplay(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
+            PagedResourcesAssembler<LessonsDisplayResponse> assembler
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        Page<LessonsDisplayResponse> lessonPage = lessonService.getLessonsForDisplay(user, page, size);
+
+        PagedModel<EntityModel<LessonsDisplayResponse>> pagedModel = assembler.toModel(lessonPage, lessonsDisplayResponse ->
+                EntityModel.of(lessonsDisplayResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsForDisplay(page, size, request, assembler)).withSelfRel())
+        );
+
+        PagedModel<LessonsDisplayResponse> result = PagedModel.of(
+                lessonPage.getContent(),
+                pagedModel.getMetadata()
+        );
+
+        return ResponseEntity.ok(result);
     }
 }
