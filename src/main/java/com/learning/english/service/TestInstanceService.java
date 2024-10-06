@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +50,7 @@ public class TestInstanceService {
                 .group(group)
                 .activationTime(testInstanceAddRequest.getActivationTime())
                 .endTime(testInstanceAddRequest.getEndTime())
+                .uuid(UUID.randomUUID())
                 .build();
 
         testInstanceRepository.save(testInstance);
@@ -68,6 +70,7 @@ public class TestInstanceService {
         List<TestInstanceDisplayResponse> displayResponses = testInstances.getContent().stream()
                 .map(testInstance -> TestInstanceDisplayResponse.builder()
                         .testInstanceId(testInstance.getId())
+                        .testInstanceUUID(testInstance.getUuid())
                         .testName(testInstance.getTestTemplate().getName())
                         .activationTime(testInstance.getActivationTime())
                         .endTime(testInstance.getEndTime())
