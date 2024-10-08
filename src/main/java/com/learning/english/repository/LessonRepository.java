@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface LessonRepository extends CrudRepository<Lesson, Integer> {
     List<Lesson> findAllByGroupsContaining(Group group);
-    Page<Lesson> findAllByGroupsIn(List<Group> groups, Pageable pageable);
+    Page<Lesson> findAllByGroupsContaining(Group group, Pageable pageable);
 }

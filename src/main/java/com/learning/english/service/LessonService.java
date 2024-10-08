@@ -71,14 +71,13 @@ public class LessonService {
                 .collect(Collectors.toList());
     }
 
-    public Page<LessonsDisplayResponse> getLessonsForDisplay(User user, int page, int size) {
-        List<Group> userGroups = userGroupRepository.findAllByUser(user).stream()
-                .map(UserGroup::getGroup)
-                .collect(Collectors.toList());
+    public Page<LessonsDisplayResponse> getLessonsForDisplay(User user, Integer groupId, int page, int size) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Lesson> lessons = lessonRepository.findAllByGroupsIn(userGroups, pageable);
+        Page<Lesson> lessons = lessonRepository.findAllByGroupsContaining(group, pageable);
 
         return lessons.map(lesson -> {
             LessonProgress lessonProgress = lessonProgressRepository
