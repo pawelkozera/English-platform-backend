@@ -2,11 +2,14 @@ package com.learning.english.service;
 
 import com.learning.english.dto.SignUpRequest;
 import com.learning.english.dto.SigninRequest;
+import com.learning.english.models.RefreshToken;
 import com.learning.english.models.Role;
 import com.learning.english.models.User;
+import com.learning.english.repository.RefreshTokenRepository;
 import com.learning.english.repository.UserRepository;
 import com.learning.english.exception.UserAlreadyExistsException;
 import com.learning.english.utils.TokenCookies;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -18,6 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -26,6 +31,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public ResponseEntity<?> signup(SignUpRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -73,7 +79,10 @@ public class AuthenticationService {
         throw new UsernameNotFoundException("Invalid user request");
     }
 
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = TokenCookies.extractRefreshToken(request);
+        Optional<RefreshToken> refreshTokenDb = refreshTokenRepository.findByToken(refreshToken);
+        refreshTokenDb.ifPresent(refreshTokenRepository::delete);
         TokenCookies.remove(response);
 
         return ResponseEntity.ok("Logged out successfully");

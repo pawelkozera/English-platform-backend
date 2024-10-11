@@ -21,7 +21,7 @@ public class TokenCookies {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .secure(false) // true when in production
-                .path("/api/v1/auth/refreshToken")
+                .path("/api/v1/auth/")
                 .maxAge(60 * 60 * 1000)
                 .sameSite("Strict")
                 .build();

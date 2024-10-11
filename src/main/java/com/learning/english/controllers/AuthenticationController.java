@@ -3,6 +3,7 @@ package com.learning.english.controllers;
 import com.learning.english.dto.SignUpRequest;
 import com.learning.english.dto.SigninRequest;
 import com.learning.english.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        return authenticationService.logout(response);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        return authenticationService.logout(request, response);
     }
 }
