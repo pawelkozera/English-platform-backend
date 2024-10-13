@@ -1,6 +1,7 @@
 package com.learning.english.controllers;
 
 import com.learning.english.dto.TaskAddRequest;
+import com.learning.english.dto.TaskResponse;
 import com.learning.english.models.User;
 import com.learning.english.service.TaskService;
 import com.learning.english.utils.AuthUtil;
@@ -21,6 +22,13 @@ public class TaskController {
         User user = authUtil.getAuthenticatedUser(request);
         taskService.addTask(taskAddRequest, user);
         return ResponseEntity.ok("Task created successfully");
+    }
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskResponse> getTaskById(HttpServletRequest request, @PathVariable Integer taskId) {
+        User user = authUtil.getAuthenticatedUser(request);
+        TaskResponse taskResponse = taskService.getTaskById(user, taskId);
+        return ResponseEntity.ok(taskResponse);
     }
 }
 

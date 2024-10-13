@@ -1,14 +1,9 @@
 package com.learning.english.service;
 
-import com.learning.english.dto.LessonAddRequest;
-import com.learning.english.dto.LessonResponse;
-import com.learning.english.dto.LessonsDisplayResponse;
-import com.learning.english.dto.WordResponse;
+import com.learning.english.dto.*;
 import com.learning.english.models.*;
-import com.learning.english.repository.GroupRepository;
-import com.learning.english.repository.LessonProgressRepository;
-import com.learning.english.repository.LessonRepository;
-import com.learning.english.repository.UserGroupRepository;
+import com.learning.english.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +20,8 @@ public class LessonService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
     private final LessonProgressRepository lessonProgressRepository;
+    private final TaskRepository taskRepository;
+    private final TaskProgressRepository taskProgressRepository;
 
     public void addLesson(LessonAddRequest lessonAddRequest, User user) {
         Group group = groupRepository.findById(lessonAddRequest.getGroupId())
@@ -94,5 +91,40 @@ public class LessonService {
                     .totalTasks(totalTasks)
                     .build();
         });
+    }
+
+    public List<TaskDisplayResponse> getTasksForLesson(User user, Integer lessonId) {
+        LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLessonId(user, lessonId);
+        List<Task> tasks = taskRepository.findByLessonId(lessonId);
+
+        if (lessonProgress == null) {
+            lessonProgress = LessonProgress.builder()
+                    .user(user)
+                    .lesson(lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found")))
+                    .completed(false)
+                    .build();
+
+            lessonProgress = lessonProgressRepository.save(lessonProgress);
+
+            for (Task task : tasks) {
+                TaskProgress taskProgress = TaskProgress.builder()
+                        .lessonProgress(lessonProgress)
+                        .task(task)
+                        .completed(false)
+                        .build();
+                taskProgressRepository.save(taskProgress);
+            }
+
+            lessonProgress = lessonProgressRepository.findById(lessonProgress.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("LessonProgress not found after saving"));
+        }
+
+        final LessonProgress finalLessonProgress = lessonProgress;
+        return tasks.stream().map(task -> {
+            boolean completed = finalLessonProgress.getTaskProgresses() != null && finalLessonProgress.getTaskProgresses().stream()
+                    .anyMatch(taskProgress -> taskProgress.getTask().getId().equals(task.getId()) && taskProgress.isCompleted());
+
+            return new TaskDisplayResponse(task.getId(), completed);
+        }).collect(Collectors.toList());
     }
 }

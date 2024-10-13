@@ -1,9 +1,6 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dto.LessonAddRequest;
-import com.learning.english.dto.LessonResponse;
-import com.learning.english.dto.LessonsDisplayResponse;
-import com.learning.english.dto.WordResponse;
+import com.learning.english.dto.*;
 import com.learning.english.models.User;
 import com.learning.english.service.LessonService;
 import com.learning.english.utils.AuthUtil;
@@ -61,5 +58,15 @@ public class LessonController {
         );
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{lessonId}/tasks")
+    public ResponseEntity<List<TaskDisplayResponse>> getTasksForLesson(
+            HttpServletRequest request,
+            @PathVariable Integer lessonId
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        List<TaskDisplayResponse> tasks = lessonService.getTasksForLesson(user, lessonId);
+        return ResponseEntity.ok(tasks);
     }
 }

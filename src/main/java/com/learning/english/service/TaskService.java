@@ -1,9 +1,13 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.TaskAddRequest;
+import com.learning.english.dto.TaskResponse;
+import com.learning.english.dto.WordResponse;
+import com.learning.english.exception.TaskNotFoundException;
 import com.learning.english.models.*;
 import com.learning.english.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +23,7 @@ public class TaskService {
     private final LessonRepository lessonRepository;
     private final UserGroupRepository userGroupRepository;
     private final WordRepository wordRepository;
+    private final GroupRepository groupRepository;
 
     public void addTask(TaskAddRequest taskAddRequest, User user) {
         TaskType taskType = taskTypeRepository.findByTypeName(taskAddRequest.getTaskTypeName())
@@ -50,5 +55,34 @@ public class TaskService {
                 .build();
 
         taskRepository.save(task);
+    }
+
+    public TaskResponse getTaskById(User user, Integer taskId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task not found"));
+
+        Lesson lesson = task.getLesson();
+        boolean userInGroup = lesson.getGroups().stream()
+                .anyMatch(group -> groupRepository.existsByGroupIdAndUserId(group.getId(), user.getId()));
+
+        if (!userInGroup) {
+            throw new AccessDeniedException("User does not belong to any group for this task's lesson");
+        }
+
+        return TaskResponse.builder()
+                .id(task.getId())
+                .taskTypeName(task.getTaskType().getTypeName())
+                .taskSubTypeName(task.getTaskSubType().getSubTypeName())
+                .content(task.getContent())
+                .correctAnswer(task.getCorrectAnswer())
+                .words(task.getWords().stream()
+                        .map(word -> WordResponse.builder()
+                                .id(word.getId())
+                                .word(word.getWord())
+                                .translation(word.getTranslation())
+                                .audioFilePath(word.getAudioFilePath())
+                                .imageFilePath(word.getImageFilePath())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 }

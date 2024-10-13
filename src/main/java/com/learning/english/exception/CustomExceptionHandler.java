@@ -1,5 +1,6 @@
 package com.learning.english.exception;
 
+import com.learning.english.models.Task;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,16 @@ public class CustomExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 "The requested resource was not found.",
                 ex.getRequestURL()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                null
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
