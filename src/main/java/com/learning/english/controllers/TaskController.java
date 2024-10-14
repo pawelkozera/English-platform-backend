@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/task")
 @RequiredArgsConstructor
@@ -29,6 +31,13 @@ public class TaskController {
         User user = authUtil.getAuthenticatedUser(request);
         TaskResponse taskResponse = taskService.getTaskById(user, taskId);
         return ResponseEntity.ok(taskResponse);
+    }
+
+    @GetMapping("/batch")
+    public ResponseEntity<List<TaskResponse>> getTasksByIds(@RequestParam List<Integer> taskIds, HttpServletRequest request) {
+        User user = authUtil.getAuthenticatedUser(request);
+        List<TaskResponse> tasks = taskService.getTasksByIds(user, taskIds);
+        return ResponseEntity.ok(tasks);
     }
 }
 

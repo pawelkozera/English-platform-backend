@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -85,4 +86,35 @@ public class TaskService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    public List<TaskResponse> getTasksByIds(User user, List<Integer> taskIds) {
+        List<Task> tasks = new ArrayList<>();
+        taskRepository.findAllById(taskIds).forEach(tasks::add);
+
+        List<TaskResponse> taskResponses = tasks.stream()
+                .filter(task -> {
+                    Lesson lesson = task.getLesson();
+                    return lesson.getGroups().stream()
+                            .anyMatch(group -> groupRepository.existsByGroupIdAndUserId(group.getId(), user.getId()));
+                })
+                .map(task -> TaskResponse.builder()
+                        .id(task.getId())
+                        .taskTypeName(task.getTaskType().getTypeName())
+                        .taskSubTypeName(task.getTaskSubType().getSubTypeName())
+                        .content(task.getContent())
+                        .correctAnswer(task.getCorrectAnswer())
+                        .words(task.getWords().stream()
+                                .map(word -> WordResponse.builder()
+                                        .id(word.getId())
+                                        .word(word.getWord())
+                                        .translation(word.getTranslation())
+                                        .audioFilePath(word.getAudioFilePath())
+                                        .imageFilePath(word.getImageFilePath())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return taskResponses;
+        }
 }
