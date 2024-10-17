@@ -35,6 +35,8 @@ public class Task {
 
     private String correctAnswer;
 
+    private Integer score;
+
     @ManyToMany
     @JoinTable(
             name = "task_word",
