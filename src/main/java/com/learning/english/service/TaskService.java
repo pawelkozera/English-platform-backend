@@ -8,6 +8,8 @@ import com.learning.english.exception.TaskNotFoundException;
 import com.learning.english.models.*;
 import com.learning.english.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +58,7 @@ public class TaskService {
                 .correctAnswer(taskAddRequest.getCorrectAnswer())
                 .lesson(lesson)
                 .words(words)
+                .owner(user)
                 .build();
 
         taskRepository.save(task);
@@ -158,5 +161,26 @@ public class TaskService {
                 }
             }
         }
+    }
+
+    public Page<TaskResponse> getTasksOwnedByUser(User user, int page, int size) {
+        Page<Task> taskPage = taskRepository.findByOwner(user, PageRequest.of(page, size));
+
+        return taskPage.map(task -> TaskResponse.builder()
+                .id(task.getId())
+                .taskTypeName(task.getTaskType().getTypeName())
+                .taskSubTypeName(task.getTaskSubType().getSubTypeName())
+                .content(task.getContent())
+                .correctAnswer(task.getCorrectAnswer())
+                .words(task.getWords().stream()
+                        .map(word -> WordResponse.builder()
+                                .id(word.getId())
+                                .word(word.getWord())
+                                .translation(word.getTranslation())
+                                .audioFilePath(word.getAudioFilePath())
+                                .imageFilePath(word.getImageFilePath())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build());
     }
 }

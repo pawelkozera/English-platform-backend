@@ -1,14 +1,17 @@
 package com.learning.english.controllers;
 
-import com.learning.english.dto.LessonAddRequest;
-import com.learning.english.dto.TaskAddRequest;
-import com.learning.english.dto.TaskCompleteRequest;
-import com.learning.english.dto.TaskResponse;
+import com.learning.english.dto.*;
+import com.learning.english.models.Task;
 import com.learning.english.models.User;
 import com.learning.english.service.TaskService;
 import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +50,29 @@ public class TaskController {
         User user = authUtil.getAuthenticatedUser(request);
         taskService.completeTask(user, taskCompleteRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/all/owned/by/user")
+    public ResponseEntity<PagedModel<TaskResponse>> getTasksOwnedByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
+            PagedResourcesAssembler<TaskResponse> assembler
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        Page<TaskResponse> taskPage = taskService.getTasksOwnedByUser(user, page, size);
+
+        PagedModel<EntityModel<TaskResponse>> pagedModel = assembler.toModel(taskPage, taskResponse ->
+                EntityModel.of(taskResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class).getTasksOwnedByUser(page, size, request, assembler)).withSelfRel())
+        );
+
+        PagedModel<TaskResponse> result = PagedModel.of(
+                taskPage.getContent(),
+                pagedModel.getMetadata()
+        );
+
+        return ResponseEntity.ok(result);
     }
 }
 
