@@ -1,12 +1,17 @@
 package com.learning.english.service;
 
+import com.learning.english.dto.TaskResponse;
 import com.learning.english.dto.TemplateAddRequest;
+import com.learning.english.dto.TestTemplateResponse;
+import com.learning.english.dto.WordResponse;
 import com.learning.english.models.Task;
 import com.learning.english.models.TestTemplate;
 import com.learning.english.models.User;
 import com.learning.english.repository.TaskRepository;
 import com.learning.english.repository.TestTemplateRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +43,31 @@ public class TestTemplateService {
                 .build();
 
         testTemplateRepository.save(testTemplate);
+    }
+
+    public Page<TestTemplateResponse> getTemplatesOwnedByUser(User user, int page, int size) {
+        Page<TestTemplate> testTemplates = testTemplateRepository.findByOwner(user, PageRequest.of(page, size));
+
+        return testTemplates.map(testTemplate -> {
+            List<TaskResponse> taskResponses = testTemplate.getTasks().stream()
+                    .map(task -> {
+                        List<WordResponse> wordResponses = task.getWords().stream()
+                                .map(word -> new WordResponse(word.getId(), word.getWord(), word.getTranslation(), word.getAudioFilePath(), word.getImageFilePath()))
+                                .collect(Collectors.toList());
+
+                        return TaskResponse.builder()
+                                .id(task.getId())
+                                .taskTypeName(task.getTaskType().getTypeName())
+                                .taskSubTypeName(task.getTaskSubType().getSubTypeName())
+                                .content(task.getContent())
+                                .correctAnswer(task.getCorrectAnswer())
+                                .words(wordResponses)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            return new TestTemplateResponse(testTemplate.getName(), taskResponses);
+        });
     }
 }
 
