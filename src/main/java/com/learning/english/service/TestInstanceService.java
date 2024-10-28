@@ -1,15 +1,24 @@
 package com.learning.english.service;
 
+import com.learning.english.dto.LessonsDisplayResponse;
 import com.learning.english.dto.TestInstanceAddRequest;
+import com.learning.english.dto.TestInstanceDisplayResponse;
 import com.learning.english.models.*;
 import com.learning.english.repository.TestInstanceRepository;
 import com.learning.english.repository.TestTemplateRepository;
 import com.learning.english.repository.GroupRepository;
 import com.learning.english.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +52,28 @@ public class TestInstanceService {
                 .build();
 
         testInstanceRepository.save(testInstance);
+    }
+
+
+    public Page<TestInstanceDisplayResponse> getTestInstancesForDisplay(User user, Integer groupId, int page, int size) {
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroupId(user, groupId);
+        if (userGroupOptional.isEmpty()) {
+            throw new AccessDeniedException("You do not have access to this group.");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<TestInstance> testInstances = testInstanceRepository.findByGroupId(groupId, pageable);
+
+        List<TestInstanceDisplayResponse> displayResponses = testInstances.getContent().stream()
+                .map(testInstance -> TestInstanceDisplayResponse.builder()
+                        .testInstanceId(testInstance.getId())
+                        .testName(testInstance.getTestTemplate().getName())
+                        .activationTime(testInstance.getActivationTime())
+                        .endTime(testInstance.getEndTime())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(displayResponses, pageable, testInstances.getTotalElements());
     }
 }

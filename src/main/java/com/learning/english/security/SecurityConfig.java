@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/api/v1/task/**",
                                 "/api/v1/lesson/**",
                                 "/api/v1/word/**",
+                                "/api/v1/test/**",
                                 "/uploads/**"
                         ).hasAuthority("USER")
                         .anyRequest().permitAll())

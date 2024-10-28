@@ -37,7 +37,7 @@ public class TokenCookies {
         Cookie refreshTokenCookie = new Cookie("refreshToken", null);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setPath("/api/v1/auth/");
         refreshTokenCookie.setMaxAge(0);
 
         response.addCookie(accessTokenCookie);

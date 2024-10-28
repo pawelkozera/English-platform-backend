@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class TestTemplateResponse {
     private String name;
+    private Integer id;
     private List<TaskResponse> tasks;
 }

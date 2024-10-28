@@ -66,7 +66,7 @@ public class TestTemplateService {
                     })
                     .collect(Collectors.toList());
 
-            return new TestTemplateResponse(testTemplate.getName(), taskResponses);
+            return new TestTemplateResponse(testTemplate.getName(), testTemplate.getId(), taskResponses);
         });
     }
 }

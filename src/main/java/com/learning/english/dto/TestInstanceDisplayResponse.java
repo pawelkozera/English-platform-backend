@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestInstanceAddRequest {
-    private Integer testTemplateId;
-    private Integer groupId;
+public class TestInstanceDisplayResponse {
+    private Integer testInstanceId;
+    private String testName;
     private LocalDateTime activationTime;
     private LocalDateTime endTime;
 }
