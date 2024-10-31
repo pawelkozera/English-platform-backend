@@ -1,6 +1,6 @@
 package com.learning.english.service;
 
-import com.learning.english.dto.LessonsDisplayResponse;
+import com.learning.english.dto.TaskDisplayResponse;
 import com.learning.english.dto.TestInstanceAddRequest;
 import com.learning.english.dto.TestInstanceDisplayResponse;
 import com.learning.english.models.*;
@@ -75,5 +75,19 @@ public class TestInstanceService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(displayResponses, pageable, testInstances.getTotalElements());
+    }
+
+    public List<Integer> getTasksForTestInstance(User user, Integer testInstanceId) {
+        TestInstance testInstance = testInstanceRepository.findById(testInstanceId)
+                .orElseThrow(() -> new RuntimeException("TestInstance not found"));
+
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroupId(user, testInstance.getGroup().getId());
+        if (userGroupOptional.isEmpty()) {
+            throw new AccessDeniedException("You do not have access to this test instance.");
+        }
+
+        return testInstance.getTestTemplate().getTasks().stream()
+                .map(Task::getId)
+                .collect(Collectors.toList());
     }
 }

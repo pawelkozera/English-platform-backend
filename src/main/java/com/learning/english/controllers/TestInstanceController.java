@@ -15,6 +15,8 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/test/instance")
 @RequiredArgsConstructor
@@ -51,5 +53,15 @@ public class TestInstanceController {
         );
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{testInstanceId}/tasks")
+    public ResponseEntity<List<Integer>> getTasksForTestInstance(
+            HttpServletRequest request,
+            @PathVariable Integer testInstanceId
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        List<Integer> tasks = testInstanceService.getTasksForTestInstance(user, testInstanceId);
+        return ResponseEntity.ok(tasks);
     }
 }
