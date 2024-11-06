@@ -45,10 +45,14 @@ public class TestHistoryService {
 
         TestHistory testHistory = existingTestHistoryOpt.get();
 
-        testHistory.setScore(score);
-        testHistory.setCompletedAt(LocalDateTime.now());
-        testHistoryRepository.save(testHistory);
-        return ResponseEntity.ok("Test progress saved successfully");
+        if (testHistory.getCompletedAt() == null) {
+            testHistory.setScore(score);
+            testHistory.setCompletedAt(LocalDateTime.now());
+            testHistoryRepository.save(testHistory);
+            return ResponseEntity.ok("Test progress saved successfully");
+        }
+
+        return ResponseEntity.badRequest().body("Test already completed");
     }
 
     private TestHistory createNewTestHistory(TestInstance testInstance, User user) {

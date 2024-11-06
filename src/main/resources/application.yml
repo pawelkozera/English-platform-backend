@@ -1,21 +1,21 @@
 spring:
+  config:
+    import: classpath:token.properties
+
   application:
     name: english
 
   datasource:
-    url: jdbc:h2:mem:spring-security
-    driver-class-name: org.h2.Driver
-    username: root
-    password: 12345
+    url: jdbc:postgresql://localhost:5432/english
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database: POSTGRESQL
+    show-sql: true
     hibernate:
-      ddl-auto: create-drop
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: create
 
   web:
     resources:
@@ -23,7 +23,7 @@ spring:
 
 token:
   signing:
-    key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
+    key: ${token.key}
 
 server:
   port: 8080

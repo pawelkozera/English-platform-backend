@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -36,9 +37,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        String requestUri = request.getRequestURI();
+        List<String> allowedUris = List.of("/api/v1/auth/", "/h2-console");
+        if (allowedUris.stream().anyMatch(requestUri::startsWith)) {
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || Arrays.stream(cookies).noneMatch(cookie -> "accessToken".equals(cookie.getName()))) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
         }
 
@@ -49,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .orElse(null);
 
         if (jwt == null) {
-            filterChain.doFilter(request, response);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
         }
 
