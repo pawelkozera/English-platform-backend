@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface TestHistoryRepository extends CrudRepository<TestHistory, Integer> {
     Optional<TestHistory> findByTestInstanceAndUser(TestInstance testInstance, User user);
+    Optional<TestHistory> findByTestInstanceIdAndUserId(Integer testInstanceId, Integer userId);
 }

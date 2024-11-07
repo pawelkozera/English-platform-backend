@@ -20,15 +20,12 @@ public class TestHistoryController {
 
     @PostMapping("/add")
     public ResponseEntity<String> createTestHistory(HttpServletRequest request, @RequestBody TestHistoryAddRequest testHistoryAddRequest) {
-        System.out.println("dotarło");
         User user = authUtil.getAuthenticatedUser(request);
         return testHistoryService.addTestHistory(testHistoryAddRequest, user);
     }
 
     @PostMapping("/addTestHistoryBeacon")
     public ResponseEntity<String> createTestHistoryViaBeacon(HttpServletRequest request, @RequestBody String payload) {
-        System.out.println("Dotarlo beacon");
-
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             TestHistoryAddRequest testHistoryAddRequest = objectMapper.readValue(payload, TestHistoryAddRequest.class);
@@ -46,5 +43,4 @@ public class TestHistoryController {
         User user = authUtil.getAuthenticatedUser(request);
         return testHistoryService.checkTestCompletion(testInstanceId, user);
     }
-
 }
