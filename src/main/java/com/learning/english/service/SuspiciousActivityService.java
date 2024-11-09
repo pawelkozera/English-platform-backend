@@ -24,13 +24,21 @@ public class SuspiciousActivityService {
                 .findByTestInstanceIdAndUserId(request.getTestInstanceId(), user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("No TestHistory found for the given TestInstance and User"));
 
-        SuspiciousActivity suspiciousActivity = SuspiciousActivity.builder()
-                .testHistory(testHistory)
-                .timestamp(LocalDateTime.now())
-                .description(request.getDescription())
-                .build();
+        SuspiciousActivity existingActivity = suspiciousActivityRepository.findByTestHistoryAndDescription(testHistory, request.getDescription());
 
-        suspiciousActivityRepository.save(suspiciousActivity);
+        if (existingActivity != null) {
+            existingActivity.setOccurrenceCount(existingActivity.getOccurrenceCount() + 1);
+            suspiciousActivityRepository.save(existingActivity);
+        } else {
+            SuspiciousActivity newActivity = SuspiciousActivity.builder()
+                    .testHistory(testHistory)
+                    .timestamp(LocalDateTime.now())
+                    .description(request.getDescription())
+                    .occurrenceCount(1)
+                    .build();
+
+            suspiciousActivityRepository.save(newActivity);
+        }
 
         if (!testHistory.isSuspiciousActivityDetected()) {
             testHistory.setSuspiciousActivityDetected(true);
