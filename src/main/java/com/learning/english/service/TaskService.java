@@ -7,6 +7,7 @@ import com.learning.english.dto.WordResponse;
 import com.learning.english.exception.TaskNotFoundException;
 import com.learning.english.models.*;
 import com.learning.english.repository.*;
+import com.learning.english.utils.Base64Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -129,13 +130,13 @@ public class TaskService {
                             .id(task.getId())
                             .taskTypeName(task.getTaskType().getTypeName())
                             .taskSubTypeName(task.getTaskSubType().getSubTypeName())
-                            .content(task.getContent())
-                            .correctAnswer(task.getCorrectAnswer())
+                            .content(Base64Util.encode(task.getContent()))
+                            .correctAnswer(Base64Util.encode(task.getCorrectAnswer()))
                             .words(task.getWords().stream()
                                     .map(word -> WordResponse.builder()
                                             .id(word.getId())
-                                            .word(word.getWord())
-                                            .translation(word.getTranslation())
+                                            .word(Base64Util.encode(word.getWord()))
+                                            .translation(Base64Util.encode(word.getTranslation()))
                                             .audioFilePath(word.getAudioFilePath())
                                             .imageFilePath(word.getImageFilePath())
                                             .build())
