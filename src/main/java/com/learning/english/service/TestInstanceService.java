@@ -50,6 +50,7 @@ public class TestInstanceService {
                 .group(group)
                 .activationTime(testInstanceAddRequest.getActivationTime())
                 .endTime(testInstanceAddRequest.getEndTime())
+                .timeDuration(testInstanceAddRequest.getTimeDuration())
                 .uuid(UUID.randomUUID())
                 .build();
 
@@ -74,6 +75,7 @@ public class TestInstanceService {
                         .testName(testInstance.getTestTemplate().getName())
                         .activationTime(testInstance.getActivationTime())
                         .endTime(testInstance.getEndTime())
+                        .timeDuration(testInstance.getTimeDuration())
                         .build())
                 .collect(Collectors.toList());
 

@@ -27,6 +27,8 @@ public class TestInstance {
 
     private LocalDateTime endTime;
 
+    private Integer timeDuration;
+
     @ManyToOne
     @JoinColumn(name = "test_template_id", nullable = false)
     private TestTemplate testTemplate;

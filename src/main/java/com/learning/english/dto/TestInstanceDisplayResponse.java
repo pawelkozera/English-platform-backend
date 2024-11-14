@@ -18,4 +18,5 @@ public class TestInstanceDisplayResponse {
     private String testName;
     private LocalDateTime activationTime;
     private LocalDateTime endTime;
+    private Integer timeDuration;
 }

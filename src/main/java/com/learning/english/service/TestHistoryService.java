@@ -33,6 +33,10 @@ public class TestHistoryService {
         Optional<TestHistory> existingTestHistoryOpt = testHistoryRepository.findByTestInstanceAndUser(testInstance, user);
 
         if (existingTestHistoryOpt.isEmpty()) {
+            if (testInstance.getEndTime().isBefore(LocalDateTime.now()) || testInstance.getActivationTime().isAfter(LocalDateTime.now())) {
+                return ResponseEntity.status(403).body("Access denied: Test has already ended or hasn't started yet");
+            }
+
             TestHistory testHistory = createNewTestHistory(testInstance, user);
             testHistoryRepository.save(testHistory);
             return ResponseEntity.ok("Test started successfully");

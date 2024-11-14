@@ -16,4 +16,5 @@ public class TestInstanceAddRequest {
     private Integer groupId;
     private LocalDateTime activationTime;
     private LocalDateTime endTime;
+    private Integer timeDuration;
 }

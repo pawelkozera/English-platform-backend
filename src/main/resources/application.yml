@@ -20,6 +20,9 @@ spring:
     resources:
       add-mappings: false
 
+  jackson:
+    time-zone: UTC
+
 token:
   signing:
     key: ${token.key}
