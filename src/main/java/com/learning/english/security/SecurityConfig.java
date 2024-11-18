@@ -28,19 +28,6 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain homepageFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/")
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
-                );
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain authorizeFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -55,9 +42,10 @@ public class SecurityConfig {
                                 "/api/v1/word/**",
                                 "/api/v1/test/**",
                                 "/api/v1/suspicious/activity/**",
+                                "/api/v1/repetition/**",
                                 "/uploads/**"
                         ).hasAuthority("USER")
-                        .anyRequest().permitAll())
+                        .anyRequest().denyAll())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

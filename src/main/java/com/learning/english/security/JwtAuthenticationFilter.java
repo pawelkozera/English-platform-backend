@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userEmail;
 
         String requestUri = request.getRequestURI();
-        List<String> allowedUris = List.of("/api/v1/auth/", "/h2-console");
+        List<String> allowedUris = List.of("/api/v1/auth/");
         if (allowedUris.stream().anyMatch(requestUri::startsWith)) {
             filterChain.doFilter(request, response);
             return;

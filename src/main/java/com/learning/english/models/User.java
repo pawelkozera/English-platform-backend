@@ -38,7 +38,7 @@ public class User implements UserDetails {
     private List<Word> createdWords;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<Review> reviews;
+    private List<Repetition> repetitions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<LessonProgress> lessonProgresses;
