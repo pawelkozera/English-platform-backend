@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,8 +27,8 @@ public class Word {
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
 
-    @ManyToMany(mappedBy = "words", cascade = CascadeType.PERSIST)
-    private List<Repetition> repetitions = new ArrayList<>();
+    @OneToMany(mappedBy = "word")
+    private List<RepetitionWord> repetitionWords;
 
     @ManyToMany(mappedBy = "words")
     private List<Task> tasks;

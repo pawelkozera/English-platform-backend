@@ -25,21 +25,6 @@ public class Repetition {
     @JoinColumn(name = "student_id")
     private User student;
 
-    @ManyToMany
-    @JoinTable(
-            name = "repetition_word",
-            joinColumns = @JoinColumn(name = "repetition_id"),
-            inverseJoinColumns = @JoinColumn(name = "word_id")
-    )
-    @Builder.Default
-    private List<Word> words = new ArrayList<>();
-
-    @Column(name = "efactor", nullable = false)
-    private double eFactor = 2.5;
-
-    @Column(name = "interval", nullable = false)
-    private int interval = 1;
-
-    @Column(name = "next_review_date", nullable = false)
-    private LocalDate nextReviewDate;
+    @OneToMany(mappedBy = "repetition")
+    private List<RepetitionWord> repetitionWords = new ArrayList<>();
 }

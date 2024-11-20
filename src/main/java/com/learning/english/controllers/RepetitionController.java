@@ -7,10 +7,7 @@ import com.learning.english.utils.AuthUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/repetition")
@@ -24,5 +21,12 @@ public class RepetitionController {
         User user = authUtil.getAuthenticatedUser(request);
         repetitionService.addRepetition(repetitionAddRequest, user);
         return ResponseEntity.ok("Repetition added successfully");
+    }
+
+    @DeleteMapping("/remove/{wordId}")
+    public ResponseEntity<String> removeRepetition(HttpServletRequest request, @PathVariable Integer wordId) {
+        User user = authUtil.getAuthenticatedUser(request);
+        repetitionService.removeRepetition(wordId, user);
+        return ResponseEntity.ok("Repetition removed successfully");
     }
 }
