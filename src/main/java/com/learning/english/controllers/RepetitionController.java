@@ -36,4 +36,11 @@ public class RepetitionController {
         boolean exists = repetitionService.isWordInRepetitions(wordId, user);
         return ResponseEntity.ok(exists);
     }
+
+    @GetMapping("/count/today/{groupId}")
+    public ResponseEntity<Long> getRepetitionsForTodayByGroup(HttpServletRequest request, @PathVariable Integer groupId) {
+        User user = authUtil.getAuthenticatedUser(request);
+        long count = repetitionService.countRepetitionsForTodayByGroup(user, groupId);
+        return ResponseEntity.ok(count);
+    }
 }

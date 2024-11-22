@@ -48,7 +48,7 @@ public class RepetitionService {
                 .word(word)
                 .eFactor(2.5)
                 .interval(1)
-                .nextReviewDate(LocalDate.now().plusDays(1))
+                .nextReviewDate(LocalDate.now().plusDays(0))
                 .build();
 
         repetitionWordRepository.save(repetitionWord);
@@ -75,4 +75,10 @@ public class RepetitionService {
 
         return repetitionWordRepository.existsByRepetitionStudentAndWord(user, word);
     }
+
+    public long countRepetitionsForTodayByGroup(User user, Integer groupId) {
+        LocalDate today = LocalDate.now();
+        return repetitionWordRepository.countByRepetitionStudentAndRepetitionGroupIdAndNextReviewDate(user, groupId, today);
+    }
+
 }
