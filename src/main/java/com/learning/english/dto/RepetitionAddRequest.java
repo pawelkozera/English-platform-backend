@@ -9,4 +9,5 @@ import lombok.*;
 @Getter
 public class RepetitionAddRequest {
     private Integer wordId;
+    private Integer groupId;
 }

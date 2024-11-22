@@ -25,6 +25,10 @@ public class Repetition {
     @JoinColumn(name = "student_id")
     private User student;
 
-    @OneToMany(mappedBy = "repetition")
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
+    @OneToMany(mappedBy = "repetition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RepetitionWord> repetitionWords = new ArrayList<>();
 }

@@ -29,4 +29,11 @@ public class RepetitionController {
         repetitionService.removeRepetition(wordId, user);
         return ResponseEntity.ok("Repetition removed successfully");
     }
+
+    @GetMapping("/exists/{wordId}")
+    public ResponseEntity<Boolean> isWordInRepetitions(HttpServletRequest request, @PathVariable Integer wordId) {
+        User user = authUtil.getAuthenticatedUser(request);
+        boolean exists = repetitionService.isWordInRepetitions(wordId, user);
+        return ResponseEntity.ok(exists);
+    }
 }
