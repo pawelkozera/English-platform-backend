@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 public class RepetitionDisplayResponse {
-    private Integer RepetitionWordId;
+    private Integer repetitionWordId;
     private String word;
     private String translation;
     private String audioFilePath;

@@ -1,7 +1,9 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.RepetitionAddRequest;
+import com.learning.english.dto.RepetitionDisplayRequest;
 import com.learning.english.dto.RepetitionDisplayResponse;
+import com.learning.english.dto.RepetitionUpdateRequest;
 import com.learning.english.models.*;
 import com.learning.english.repository.GroupRepository;
 import com.learning.english.repository.RepetitionRepository;
@@ -85,18 +87,56 @@ public class RepetitionService {
         return repetitionWordRepository.countByRepetitionStudentAndRepetitionGroupIdAndNextReviewDateLessThanEqual(user, groupId, today);
     }
 
-    public List<RepetitionDisplayResponse> getRepetitionWords(User user, Integer groupId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
-        List<RepetitionWord> repetitions = repetitionWordRepository.findDueRepetitions(user.getId(), groupId, pageable);
+    public List<RepetitionDisplayResponse> getRepetitionWords(User user, RepetitionDisplayRequest repetitionDisplayRequest) {
+        Pageable pageable = PageRequest.of(0, repetitionDisplayRequest.getLimit());
+
+        List<RepetitionWord> repetitions;
+        if (repetitionDisplayRequest.getAnsweredWordIds() != null && !repetitionDisplayRequest.getAnsweredWordIds().isEmpty()) {
+            repetitions = repetitionWordRepository.findDueRepetitionsExcludingAnswered(user.getId(), repetitionDisplayRequest.getGroupId(), repetitionDisplayRequest.getAnsweredWordIds(), pageable);
+        } else {
+            repetitions = repetitionWordRepository.findDueRepetitions(user.getId(), repetitionDisplayRequest.getGroupId(), pageable);
+        }
 
         return repetitions.stream()
                 .map(repetition -> RepetitionDisplayResponse.builder()
-                        .RepetitionWordId(repetition.getId())
+                        .repetitionWordId(repetition.getId())
                         .word(repetition.getWord().getWord())
                         .translation(repetition.getWord().getTranslation())
                         .audioFilePath(repetition.getWord().getAudioFilePath())
                         .imageFilePath(repetition.getWord().getImageFilePath())
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public void updateRepetition(RepetitionUpdateRequest repetitionUpdateRequest, User user) {
+        RepetitionWord repetitionWord = repetitionWordRepository.findById(repetitionUpdateRequest.getRepetitionWordId())
+                .orElseThrow(() -> new IllegalArgumentException("Repetition word not found"));
+
+        Repetition repetition = repetitionWord.getRepetition();
+
+        if (!repetition.getStudent().equals(user)) {
+            throw new IllegalArgumentException("User does not have permission to update this repetition word");
+        }
+
+        int grade = repetitionUpdateRequest.getGrade();
+        if (grade < 1 || grade > 3) {
+            throw new IllegalArgumentException("Invalid grade");
+        }
+
+        double newEFactor = repetitionWord.getEFactor() + (0.1 - (3 - grade) * (0.08 + (3 - grade) * 0.02));
+        repetitionWord.setEFactor(Math.max(1.3, newEFactor));
+
+        if (grade == 1) {
+            repetitionWord.setInterval(1);
+        } else if (grade == 2) {
+            repetitionWord.setInterval(Math.max(1, (int) (repetitionWord.getInterval() * 0.5)));
+        } else {
+            repetitionWord.setInterval(repetitionWord.getInterval() == 0 ? 1 : (int) (repetitionWord.getInterval() * repetitionWord.getEFactor()));
+        }
+
+        repetitionWord.setNextReviewDate(LocalDate.now().plusDays(repetitionWord.getInterval()));
+
+        repetitionWordRepository.save(repetitionWord);
     }
 }

@@ -1,7 +1,9 @@
 package com.learning.english.controllers;
 
 import com.learning.english.dto.RepetitionAddRequest;
+import com.learning.english.dto.RepetitionDisplayRequest;
 import com.learning.english.dto.RepetitionDisplayResponse;
+import com.learning.english.dto.RepetitionUpdateRequest;
 import com.learning.english.models.User;
 import com.learning.english.service.RepetitionService;
 import com.learning.english.utils.AuthUtil;
@@ -47,13 +49,22 @@ public class RepetitionController {
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/words/{groupId}")
-    public ResponseEntity<List<RepetitionDisplayResponse>> getRepetitionWords(
-            HttpServletRequest request,
-            @PathVariable Integer groupId,
-            @RequestParam(defaultValue = "30") int limit) {
+    @GetMapping("/words")
+    public ResponseEntity<List<RepetitionDisplayResponse>> getRepetitionWords(HttpServletRequest request, RepetitionDisplayRequest repetitionDisplayRequest) {
         User user = authUtil.getAuthenticatedUser(request);
-        List<RepetitionDisplayResponse> words = repetitionService.getRepetitionWords(user, groupId, limit);
+        List<RepetitionDisplayResponse> words = repetitionService.getRepetitionWords(user, repetitionDisplayRequest);
         return ResponseEntity.ok(words);
     }
+
+    @PostMapping("/update")
+    public ResponseEntity<String> updateRepetition(HttpServletRequest request, @RequestBody List<RepetitionUpdateRequest> repetitionUpdateRequests) {
+        User user = authUtil.getAuthenticatedUser(request);
+
+        for (RepetitionUpdateRequest repetitionUpdateRequest : repetitionUpdateRequests) {
+            repetitionService.updateRepetition(repetitionUpdateRequest, user);
+        }
+
+        return ResponseEntity.ok("Repetitions updated successfully");
+    }
+
 }

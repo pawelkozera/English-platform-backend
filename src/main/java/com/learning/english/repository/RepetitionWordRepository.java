@@ -28,4 +28,17 @@ public interface RepetitionWordRepository extends JpaRepository<RepetitionWord, 
     List<RepetitionWord> findDueRepetitions(@Param("userId") Integer userId,
                                             @Param("groupId") Integer groupId,
                                             Pageable pageable);
+
+    @Query("SELECT rw FROM RepetitionWord rw " +
+            "JOIN rw.repetition r " +
+            "WHERE r.student.id = :userId " +
+            "AND r.group.id = :groupId " +
+            "AND rw.nextReviewDate <= CURRENT_DATE " +
+            "AND rw.id NOT IN :answeredWordIds " +
+            "ORDER BY rw.nextReviewDate ASC")
+    List<RepetitionWord> findDueRepetitionsExcludingAnswered(
+            @Param("userId") Integer userId,
+            @Param("groupId") Integer groupId,
+            @Param("answeredWordIds") List<Integer> answeredWordIds,
+            Pageable pageable);
 }
