@@ -1,6 +1,7 @@
 package com.learning.english.controllers;
 
 import com.learning.english.dto.RepetitionAddRequest;
+import com.learning.english.dto.RepetitionDisplayResponse;
 import com.learning.english.models.User;
 import com.learning.english.service.RepetitionService;
 import com.learning.english.utils.AuthUtil;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/repetition")
@@ -42,5 +45,15 @@ public class RepetitionController {
         User user = authUtil.getAuthenticatedUser(request);
         long count = repetitionService.countRepetitionsForTodayByGroup(user, groupId);
         return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/words/{groupId}")
+    public ResponseEntity<List<RepetitionDisplayResponse>> getRepetitionWords(
+            HttpServletRequest request,
+            @PathVariable Integer groupId,
+            @RequestParam(defaultValue = "30") int limit) {
+        User user = authUtil.getAuthenticatedUser(request);
+        List<RepetitionDisplayResponse> words = repetitionService.getRepetitionWords(user, groupId, limit);
+        return ResponseEntity.ok(words);
     }
 }

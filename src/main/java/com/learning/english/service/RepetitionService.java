@@ -1,6 +1,7 @@
 package com.learning.english.service;
 
 import com.learning.english.dto.RepetitionAddRequest;
+import com.learning.english.dto.RepetitionDisplayResponse;
 import com.learning.english.models.*;
 import com.learning.english.repository.GroupRepository;
 import com.learning.english.repository.RepetitionRepository;
@@ -8,9 +9,12 @@ import com.learning.english.repository.RepetitionWordRepository;
 import com.learning.english.repository.WordRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +82,21 @@ public class RepetitionService {
 
     public long countRepetitionsForTodayByGroup(User user, Integer groupId) {
         LocalDate today = LocalDate.now();
-        return repetitionWordRepository.countByRepetitionStudentAndRepetitionGroupIdAndNextReviewDate(user, groupId, today);
+        return repetitionWordRepository.countByRepetitionStudentAndRepetitionGroupIdAndNextReviewDateLessThanEqual(user, groupId, today);
     }
 
+    public List<RepetitionDisplayResponse> getRepetitionWords(User user, Integer groupId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<RepetitionWord> repetitions = repetitionWordRepository.findDueRepetitions(user.getId(), groupId, pageable);
+
+        return repetitions.stream()
+                .map(repetition -> RepetitionDisplayResponse.builder()
+                        .RepetitionWordId(repetition.getId())
+                        .word(repetition.getWord().getWord())
+                        .translation(repetition.getWord().getTranslation())
+                        .audioFilePath(repetition.getWord().getAudioFilePath())
+                        .imageFilePath(repetition.getWord().getImageFilePath())
+                        .build())
+                .toList();
+    }
 }
