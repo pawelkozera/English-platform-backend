@@ -73,7 +73,6 @@ public class LessonService {
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         Pageable pageable = PageRequest.of(page, size);
-
         Page<Lesson> lessons = lessonRepository.findAllByGroupsContaining(group, pageable);
 
         return lessons.map(lesson -> {
@@ -81,7 +80,46 @@ public class LessonService {
                     .findByUserAndLesson(user, lesson)
                     .orElse(null);
 
-            int completedTasks = lessonProgress != null ? lessonProgress.getCompletedTaskCount() : 0;
+            if (lessonProgress == null) {
+                lessonProgress = LessonProgress.builder()
+                        .user(user)
+                        .lesson(lesson)
+                        .completed(false)
+                        .build();
+                lessonProgress = lessonProgressRepository.save(lessonProgress);
+
+                for (Task task : lesson.getTasks()) {
+                    TaskProgress taskProgress = TaskProgress.builder()
+                            .lessonProgress(lessonProgress)
+                            .task(task)
+                            .completed(false)
+                            .build();
+                    taskProgressRepository.save(taskProgress);
+                }
+            } else {
+                for (Task task : lesson.getTasks()) {
+                    boolean taskProgressExists = lessonProgress.getTaskProgresses().stream()
+                            .anyMatch(taskProgress -> taskProgress.getTask().getId().equals(task.getId()));
+
+                    if (!taskProgressExists) {
+                        TaskProgress taskProgress = TaskProgress.builder()
+                                .lessonProgress(lessonProgress)
+                                .task(task)
+                                .completed(false)
+                                .build();
+                        taskProgressRepository.save(taskProgress);
+
+                        if (lessonProgress.isCompleted()) {
+                            lessonProgress.setCompleted(false);
+                            lessonProgressRepository.save(lessonProgress);
+                        }
+                    }
+                }
+            }
+
+            int completedTasks = (int) lessonProgress.getTaskProgresses().stream()
+                    .filter(TaskProgress::isCompleted)
+                    .count();
             int totalTasks = lesson.getTasks().size();
 
             return LessonsDisplayResponse.builder()

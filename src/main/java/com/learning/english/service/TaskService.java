@@ -151,20 +151,28 @@ public class TaskService {
     public void completeTask(User user, TaskCompleteRequest taskCompleteRequest) {
         Integer lessonId = taskCompleteRequest.getLessonId();
         LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLessonId(user, lessonId);
+
         if (lessonProgress != null) {
             Integer taskId = taskCompleteRequest.getTaskId();
+
             TaskProgress taskProgress = taskProgressRepository.findByLessonProgressAndTaskId(lessonProgress, taskId);
-            if (taskProgress != null) {
+
+            if (!taskProgress.isCompleted()) {
                 taskProgress.setCompleted(true);
                 taskProgressRepository.save(taskProgress);
 
-                if (lessonProgress.getCompletedTaskCount() == lessonProgress.getTaskProgresses().size()) {
-                    lessonProgress.setCompleted(true);
-                    lessonProgressRepository.save(lessonProgress);
-                }
+                int completedCount = (int) lessonProgress.getTaskProgresses().stream()
+                        .filter(TaskProgress::isCompleted)
+                        .count();
+                int totalTasks = lessonProgress.getTaskProgresses().size();
+
+                lessonProgress.setCompleted(completedCount == totalTasks);
+
+                lessonProgressRepository.save(lessonProgress);
             }
         }
     }
+
 
     public Page<TaskResponse> getTasksOwnedByUser(User user, int page, int size) {
         Page<Task> taskPage = taskRepository.findByOwner(user, PageRequest.of(page, size));

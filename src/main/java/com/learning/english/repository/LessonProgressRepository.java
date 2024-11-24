@@ -5,10 +5,12 @@ import com.learning.english.models.LessonProgress;
 import com.learning.english.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LessonProgressRepository extends JpaRepository<LessonProgress, Integer> {
     Optional<LessonProgress> findByUserAndLesson(User user, Lesson lesson);
     LessonProgress findByUserAndLessonId(User user, Integer lessonId);
+    List<LessonProgress> findByLessonId(Integer lessonId);
 }
 

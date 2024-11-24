@@ -1,11 +1,9 @@
 package com.learning.english.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Setter
 @Table(name = "lesson_progress")
 public class LessonProgress {
     @Id
@@ -30,9 +29,5 @@ public class LessonProgress {
     private boolean completed;
 
     @OneToMany(mappedBy = "lessonProgress", cascade = CascadeType.ALL)
-    private List<TaskProgress> taskProgresses;
-
-    public int getCompletedTaskCount() {
-        return (int) taskProgresses.stream().filter(TaskProgress::isCompleted).count();
-    }
+    private List<TaskProgress> taskProgresses = new ArrayList<>();
 }
