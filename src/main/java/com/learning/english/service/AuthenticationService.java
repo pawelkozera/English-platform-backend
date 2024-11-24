@@ -83,7 +83,8 @@ public class AuthenticationService {
         String refreshToken = TokenCookies.extractRefreshToken(request);
         Optional<RefreshToken> refreshTokenDb = refreshTokenRepository.findByToken(refreshToken);
         refreshTokenDb.ifPresent(refreshTokenRepository::delete);
-        TokenCookies.remove(response);
+        TokenCookies.removeAccessTokenCookie(response);
+        TokenCookies.removeRefreshTokenCookie(response);
 
         return ResponseEntity.ok("Logged out successfully");
     }

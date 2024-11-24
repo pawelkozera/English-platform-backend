@@ -12,7 +12,7 @@ public class TokenCookies {
                 .httpOnly(true)
                 .secure(false) // true when in production
                 .path("/")
-                .maxAge(60 * 24)
+                .maxAge(60 * 60 * 1000)
                 .sameSite("Strict")
                 .build();
     }
@@ -27,20 +27,23 @@ public class TokenCookies {
                 .build();
     }
 
-    public static void remove(@NonNull HttpServletResponse response) {
+    public static void removeAccessTokenCookie(@NonNull HttpServletResponse response) {
         Cookie accessTokenCookie = new Cookie("accessToken", null);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(0);
 
+        response.addCookie(accessTokenCookie);
+    }
+
+    public static void removeRefreshTokenCookie(@NonNull HttpServletResponse response) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", null);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/api/v1/auth/");
         refreshTokenCookie.setMaxAge(0);
 
-        response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
     }
 

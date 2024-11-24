@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (JwtException | UsernameNotFoundException e) {
-            TokenCookies.remove(response);
+            TokenCookies.removeAccessTokenCookie(response);
             SecurityContextHolder.clearContext();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
