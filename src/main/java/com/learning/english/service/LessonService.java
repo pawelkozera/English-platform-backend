@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,50 +77,13 @@ public class LessonService {
         Page<Lesson> lessons = lessonRepository.findAllByGroupsContaining(group, pageable);
 
         return lessons.map(lesson -> {
-            LessonProgress lessonProgress = lessonProgressRepository
-                    .findByUserAndLesson(user, lesson)
-                    .orElse(null);
+            LessonProgress lessonProgress = lessonProgressRepository.findByUserAndLesson(user, lesson).orElse(null);
 
-            if (lessonProgress == null) {
-                lessonProgress = LessonProgress.builder()
-                        .user(user)
-                        .lesson(lesson)
-                        .completed(false)
-                        .build();
-                lessonProgress = lessonProgressRepository.save(lessonProgress);
+            int completedTasks = lessonProgress == null ? 0 :
+                    (int) lessonProgress.getTaskProgresses().stream()
+                            .filter(TaskProgress::isCompleted)
+                            .count();
 
-                for (Task task : lesson.getTasks()) {
-                    TaskProgress taskProgress = TaskProgress.builder()
-                            .lessonProgress(lessonProgress)
-                            .task(task)
-                            .completed(false)
-                            .build();
-                    taskProgressRepository.save(taskProgress);
-                }
-            } else {
-                for (Task task : lesson.getTasks()) {
-                    boolean taskProgressExists = lessonProgress.getTaskProgresses().stream()
-                            .anyMatch(taskProgress -> taskProgress.getTask().getId().equals(task.getId()));
-
-                    if (!taskProgressExists) {
-                        TaskProgress taskProgress = TaskProgress.builder()
-                                .lessonProgress(lessonProgress)
-                                .task(task)
-                                .completed(false)
-                                .build();
-                        taskProgressRepository.save(taskProgress);
-
-                        if (lessonProgress.isCompleted()) {
-                            lessonProgress.setCompleted(false);
-                            lessonProgressRepository.save(lessonProgress);
-                        }
-                    }
-                }
-            }
-
-            int completedTasks = (int) lessonProgress.getTaskProgresses().stream()
-                    .filter(TaskProgress::isCompleted)
-                    .count();
             int totalTasks = lesson.getTasks().size();
 
             return LessonsDisplayResponse.builder()
@@ -138,23 +102,44 @@ public class LessonService {
         if (lessonProgress == null) {
             lessonProgress = LessonProgress.builder()
                     .user(user)
-                    .lesson(lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found")))
-                    .completed(false)
+                    .lesson(lessonRepository.findById(lessonId)
+                            .orElseThrow(() -> new EntityNotFoundException("Lesson not found")))
                     .build();
 
             lessonProgress = lessonProgressRepository.save(lessonProgress);
 
-            for (Task task : tasks) {
-                TaskProgress taskProgress = TaskProgress.builder()
-                        .lessonProgress(lessonProgress)
-                        .task(task)
-                        .completed(false)
-                        .build();
-                taskProgressRepository.save(taskProgress);
-            }
+            LessonProgress finalLessonProgress2 = lessonProgress;
+            List<TaskProgress> newTaskProgresses = tasks.stream()
+                    .map(task -> TaskProgress.builder()
+                            .lessonProgress(finalLessonProgress2)
+                            .task(task)
+                            .completed(false)
+                            .build())
+                    .toList();
+            taskProgressRepository.saveAll(newTaskProgresses);
 
             lessonProgress = lessonProgressRepository.findById(lessonProgress.getId())
                     .orElseThrow(() -> new EntityNotFoundException("LessonProgress not found after saving"));
+        } else {
+            List<TaskProgress> existingTaskProgresses = taskProgressRepository.findByLessonProgress(lessonProgress);
+
+            Set<Integer> existingTaskIds = existingTaskProgresses.stream()
+                    .map(taskProgress -> taskProgress.getTask().getId())
+                    .collect(Collectors.toSet());
+
+            LessonProgress finalLessonProgress1 = lessonProgress;
+            List<TaskProgress> newTaskProgresses = tasks.stream()
+                    .filter(task -> !existingTaskIds.contains(task.getId()))
+                    .map(task -> TaskProgress.builder()
+                            .lessonProgress(finalLessonProgress1)
+                            .task(task)
+                            .completed(false)
+                            .build())
+                    .toList();
+
+            if (!newTaskProgresses.isEmpty()) {
+                taskProgressRepository.saveAll(newTaskProgresses);
+            }
         }
 
         final LessonProgress finalLessonProgress = lessonProgress;

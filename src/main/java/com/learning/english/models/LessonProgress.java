@@ -26,8 +26,6 @@ public class LessonProgress {
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;
 
-    private boolean completed;
-
     @OneToMany(mappedBy = "lessonProgress", cascade = CascadeType.ALL)
     private List<TaskProgress> taskProgresses = new ArrayList<>();
 }

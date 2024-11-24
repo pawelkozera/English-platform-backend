@@ -160,15 +160,6 @@ public class TaskService {
             if (!taskProgress.isCompleted()) {
                 taskProgress.setCompleted(true);
                 taskProgressRepository.save(taskProgress);
-
-                int completedCount = (int) lessonProgress.getTaskProgresses().stream()
-                        .filter(TaskProgress::isCompleted)
-                        .count();
-                int totalTasks = lessonProgress.getTaskProgresses().size();
-
-                lessonProgress.setCompleted(completedCount == totalTasks);
-
-                lessonProgressRepository.save(lessonProgress);
             }
         }
     }
