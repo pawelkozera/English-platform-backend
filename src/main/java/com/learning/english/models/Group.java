@@ -31,4 +31,7 @@ public class Group {
     @ManyToMany(mappedBy = "groups")
     @Builder.Default
     private List<Lesson> lessons = new ArrayList<>();
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<Announcement> announcements = new ArrayList<>();
 }

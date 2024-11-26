@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/api/v1/test/**",
                                 "/api/v1/suspicious/activity/**",
                                 "/api/v1/repetition/**",
+                                "/api/v1/announcement/**",
                                 "/uploads/**"
                         ).hasAuthority("USER")
                         .anyRequest().denyAll())
