@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +58,6 @@ public class TestInstanceService {
         testInstanceRepository.save(testInstance);
     }
 
-
     public Page<TestInstanceDisplayResponse> getTestInstancesForDisplay(User user, Integer groupId, int page, int size) {
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroupId(user, groupId);
         if (userGroupOptional.isEmpty()) {
@@ -68,7 +68,10 @@ public class TestInstanceService {
 
         Page<TestInstance> testInstances = testInstanceRepository.findByGroupId(groupId, pageable);
 
+        LocalDateTime now = LocalDateTime.now();
+
         List<TestInstanceDisplayResponse> displayResponses = testInstances.getContent().stream()
+                .filter(testInstance -> now.isAfter(testInstance.getActivationTime()) && now.isBefore(testInstance.getEndTime()))
                 .map(testInstance -> TestInstanceDisplayResponse.builder()
                         .testInstanceId(testInstance.getId())
                         .testInstanceUUID(testInstance.getUuid())
@@ -81,6 +84,7 @@ public class TestInstanceService {
 
         return new PageImpl<>(displayResponses, pageable, testInstances.getTotalElements());
     }
+
 
     public List<Integer> getTasksForTestInstance(User user, Integer testInstanceId) {
         TestInstance testInstance = testInstanceRepository.findById(testInstanceId)
