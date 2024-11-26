@@ -32,4 +32,6 @@ public class TestTemplate {
             inverseJoinColumns = @JoinColumn(name = "task_id")
     )
     private List<Task> tasks;
+
+    private Integer totalScore;
 }

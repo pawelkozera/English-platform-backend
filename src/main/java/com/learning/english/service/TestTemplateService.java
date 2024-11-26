@@ -36,10 +36,15 @@ public class TestTemplateService {
             throw new IllegalArgumentException("Some tasks do not belong to the user");
         }
 
+        Integer totalScore = userTasks.stream()
+                .mapToInt(Task::getScore)
+                .sum();
+
         TestTemplate testTemplate = TestTemplate.builder()
                 .name(templateAddRequest.getName())
                 .tasks(userTasks)
                 .owner(user)
+                .totalScore(totalScore)
                 .build();
 
         testTemplateRepository.save(testTemplate);
