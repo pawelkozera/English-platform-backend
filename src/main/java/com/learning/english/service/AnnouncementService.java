@@ -3,12 +3,10 @@ package com.learning.english.service;
 import com.learning.english.dto.AnnouncementAddRequest;
 import com.learning.english.dto.AnnouncementDisplayResponse;
 import com.learning.english.dto.LessonsDisplayResponse;
-import com.learning.english.models.Announcement;
-import com.learning.english.models.Group;
-import com.learning.english.models.User;
-import com.learning.english.models.UserGroup;
+import com.learning.english.models.*;
 import com.learning.english.repository.AnnouncementRepository;
 import com.learning.english.repository.GroupRepository;
+import com.learning.english.repository.UserAnnouncementRepository;
 import com.learning.english.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +23,7 @@ public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
+    private final UserAnnouncementRepository userAnnouncementRepository;
 
     public void addAnnouncement(AnnouncementAddRequest announcementAddRequest, User user) {
         Group group = groupRepository.findById(announcementAddRequest.getGroupId())
@@ -57,6 +56,28 @@ public class AnnouncementService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
 
         Page<Announcement> announcements = announcementRepository.findByGroupId(groupId, pageable);
+
+        announcements.forEach(announcement -> {
+            userAnnouncementRepository.findByUserAndAnnouncement(user, announcement)
+                    .ifPresentOrElse(
+                            userAnnouncement -> {
+                                if (!userAnnouncement.isSeen()) {
+                                    userAnnouncement.setSeen(true);
+                                    userAnnouncement.setSeenAt(LocalDateTime.now());
+                                    userAnnouncementRepository.save(userAnnouncement);
+                                }
+                            },
+                            () -> {
+                                UserAnnouncement newEntry = UserAnnouncement.builder()
+                                        .user(user)
+                                        .announcement(announcement)
+                                        .seen(true)
+                                        .seenAt(LocalDateTime.now())
+                                        .build();
+                                userAnnouncementRepository.save(newEntry);
+                            }
+                    );
+        });
 
         return announcements.map(announcement -> AnnouncementDisplayResponse.builder()
                 .title(announcement.getTitle())

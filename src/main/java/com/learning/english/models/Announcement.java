@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,6 +24,9 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
+
+    @OneToMany(mappedBy = "announcement", cascade = CascadeType.ALL)
+    private List<UserAnnouncement> userAnnouncements;
 
     private String title;
     private String content;
