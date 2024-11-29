@@ -12,6 +12,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,6 +80,35 @@ public class WordController {
         return ResponseEntity.ok("Word created successfully");
     }
 
+    @PutMapping("/update/{wordId}")
+    public ResponseEntity<String> updateWord(
+            HttpServletRequest request,
+            @PathVariable Long wordId,
+            @ModelAttribute("wordUpdateRequest") WordAddRequest wordUpdateRequest,
+            @RequestPart(value = "audioFile", required = false) MultipartFile audioFile,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+    ) throws IOException {
+        User user = authUtil.getAuthenticatedUser(request);
+
+        String audioFilePath = null;
+        String imageFilePath = null;
+
+        if (audioFile != null && !audioFile.isEmpty()) {
+            audioFilePath = saveFile(audioFile, "audio");
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageFilePath = saveFile(imageFile, "images");
+        }
+
+        wordUpdateRequest.setAudioFilePath(audioFilePath);
+        wordUpdateRequest.setImageFilePath(imageFilePath);
+
+        wordService.updateWord(wordId, wordUpdateRequest, user);
+
+        return ResponseEntity.ok("Word updated successfully");
+    }
+
     private String saveFile(MultipartFile file, String folder) throws IOException {
         String uploadDir = "uploads/" + folder + "/";
         Path uploadPath = Paths.get(uploadDir);
@@ -93,5 +123,19 @@ public class WordController {
         Files.write(path, file.getBytes());
 
         return filePath;
+    }
+
+    @DeleteMapping("/delete/{wordId}")
+    public ResponseEntity<String> deleteWord(
+            HttpServletRequest request,
+            @PathVariable Long wordId
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        try {
+            wordService.deleteWord(wordId, user);
+            return ResponseEntity.ok().body("Word deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 }

@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface WordRepository extends CrudRepository<Word, Integer> {
+public interface WordRepository extends CrudRepository<Word, Long> {
     Page<Word> findAllByCreatedBy(User user, Pageable pageable);
 }

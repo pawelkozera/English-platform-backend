@@ -36,7 +36,7 @@ public class RepetitionController {
     }
 
     @GetMapping("/exists/{wordId}")
-    public ResponseEntity<Boolean> isWordInRepetitions(HttpServletRequest request, @PathVariable Integer wordId) {
+    public ResponseEntity<Boolean> isWordInRepetitions(HttpServletRequest request, @PathVariable Long wordId) {
         User user = authUtil.getAuthenticatedUser(request);
         boolean exists = repetitionService.isWordInRepetitions(wordId, user);
         return ResponseEntity.ok(exists);

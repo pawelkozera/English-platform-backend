@@ -75,7 +75,7 @@ public class RepetitionService {
         }
     }
 
-    public boolean isWordInRepetitions(Integer wordId, User user) {
+    public boolean isWordInRepetitions(Long wordId, User user) {
         Word word = wordRepository.findById(wordId)
                 .orElseThrow(() -> new IllegalArgumentException("Word not found"));
 

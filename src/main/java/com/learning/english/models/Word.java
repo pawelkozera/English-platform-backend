@@ -17,7 +17,7 @@ import java.util.List;
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String word;
     private String translation;
     private String audioFilePath;

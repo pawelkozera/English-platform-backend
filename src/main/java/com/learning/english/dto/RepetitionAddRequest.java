@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 public class RepetitionAddRequest {
-    private Integer wordId;
+    private Long wordId;
     private Integer groupId;
 }

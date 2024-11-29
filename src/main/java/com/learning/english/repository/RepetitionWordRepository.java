@@ -41,4 +41,6 @@ public interface RepetitionWordRepository extends JpaRepository<RepetitionWord, 
             @Param("groupId") Integer groupId,
             @Param("answeredWordIds") List<Integer> answeredWordIds,
             Pageable pageable);
+
+    void deleteAllByWord(Word word);
 }
