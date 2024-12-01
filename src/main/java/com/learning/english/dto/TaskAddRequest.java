@@ -16,7 +16,7 @@ public class TaskAddRequest {
     private String taskSubTypeName;
     private String content;
     private String correctAnswer;
-    private Integer lessonId;
+    private List<Integer> lessonId;
     private List<Long> wordIds;
     private Integer score;
 }

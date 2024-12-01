@@ -39,31 +39,41 @@ public class TaskService {
         TaskSubType taskSubType = taskSubTypeRepository.findBySubTypeName(taskAddRequest.getTaskSubTypeName())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid task sub type"));
 
-        Lesson lesson = lessonRepository.findById(taskAddRequest.getLessonId())
-                .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
+        List<Lesson> lessons = StreamSupport.stream(
+                        lessonRepository.findAllById(taskAddRequest.getLessonId()).spliterator(), false)
+                .toList();
 
-        boolean isOwner = lesson.getGroups().stream().anyMatch(group ->
-                userGroupRepository.existsByUserAndGroupAndIsOwnerTrue(user, group));
+        for (Lesson lesson : lessons) {
+            boolean isOwner = lesson.getGroups().stream().anyMatch(group ->
+                    userGroupRepository.existsByUserAndGroupAndIsOwnerTrue(user, group));
 
-        if (!isOwner) {
-            throw new IllegalArgumentException("User is not the owner of any group associated with the lesson");
+            if (!isOwner) {
+                throw new IllegalArgumentException(
+                        "User is not the owner of any group associated with the lesson: " + lesson.getId());
+            }
         }
 
-        List<Word> words = StreamSupport.stream(wordRepository.findAllById(taskAddRequest.getWordIds()).spliterator(), false)
+        List<Word> words = StreamSupport.stream(
+                        wordRepository.findAllById(taskAddRequest.getWordIds()).spliterator(), false)
                 .collect(Collectors.toList());
 
-        Task task = Task.builder()
-                .taskType(taskType)
-                .taskSubType(taskSubType)
-                .content(taskAddRequest.getContent())
-                .correctAnswer(taskAddRequest.getCorrectAnswer())
-                .lesson(lesson)
-                .words(words)
-                .owner(user)
-                .score(taskAddRequest.getScore())
-                .build();
+        List<Task> tasks = new ArrayList<>();
+        for (Lesson lesson : lessons) {
+            Task task = Task.builder()
+                    .taskType(taskType)
+                    .taskSubType(taskSubType)
+                    .content(taskAddRequest.getContent())
+                    .correctAnswer(taskAddRequest.getCorrectAnswer())
+                    .lesson(lesson)
+                    .words(words)
+                    .owner(user)
+                    .score(taskAddRequest.getScore())
+                    .build();
 
-        taskRepository.save(task);
+            tasks.add(task);
+        }
+
+        taskRepository.saveAll(tasks);
     }
 
     public TaskResponse getTaskById(User user, Integer taskId) {

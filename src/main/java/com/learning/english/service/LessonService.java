@@ -25,27 +25,32 @@ public class LessonService {
     private final TaskProgressRepository taskProgressRepository;
 
     public void addLesson(LessonAddRequest lessonAddRequest, User user) {
-        Group group = groupRepository.findById(lessonAddRequest.getGroupId())
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
-
-        boolean isOwner = userGroupRepository.existsByUserAndGroupAndIsOwnerTrue(user, group);
-        if (!isOwner) {
-            throw new IllegalArgumentException("User is not the owner of the group");
+        List<Group> groups = groupRepository.findAllById(lessonAddRequest.getGroupId());
+        if (groups.isEmpty()) {
+            throw new IllegalArgumentException("No groups found for the provided IDs");
         }
 
-        boolean lessonExists = group.getLessons().stream()
-                .anyMatch(existingLesson -> existingLesson.getTitle().equalsIgnoreCase(lessonAddRequest.getTitle()));
+        boolean isOwnerForAllGroups = groups.stream()
+                .allMatch(group -> userGroupRepository.existsByUserAndGroupAndIsOwnerTrue(user, group));
+        if (!isOwnerForAllGroups) {
+            throw new IllegalArgumentException("User is not the owner of one or more selected groups");
+        }
 
+        boolean lessonExists = groups.stream()
+                .flatMap(group -> group.getLessons().stream())
+                .anyMatch(existingLesson -> existingLesson.getTitle().equalsIgnoreCase(lessonAddRequest.getTitle()));
         if (lessonExists) {
-            throw new IllegalArgumentException("A lesson with this title already exists in the group");
+            throw new IllegalArgumentException("A lesson with this title already exists in one of the groups");
         }
 
         Lesson lesson = Lesson.builder()
                 .title(lessonAddRequest.getTitle())
                 .build();
 
-        group.getLessons().add(lesson);
-        lesson.getGroups().add(group);
+        groups.forEach(group -> {
+            group.getLessons().add(lesson);
+            lesson.getGroups().add(group);
+        });
 
         lessonRepository.save(lesson);
     }
