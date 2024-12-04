@@ -85,4 +85,26 @@ public class LessonController {
         List<TaskDisplayResponse> tasks = lessonService.getTasksForLesson(user, lessonId);
         return ResponseEntity.ok(tasks);
     }
+
+    @GetMapping("all/not/assigned/to/group/{groupId}")
+    public ResponseEntity<PagedModel<LessonResponse>> getLessonsNotAssignedToGroup(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
+            @PathVariable Integer groupId,
+            PagedResourcesAssembler<LessonResponse> assembler
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        Page<LessonResponse> lessonPage = lessonService.getLessonsNotAssignedToGroup(user, groupId, page, size);
+
+        PagedModel<EntityModel<LessonResponse>> pagedModel = assembler.toModel(lessonPage, lessonResponse ->
+                EntityModel.of(lessonResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsNotAssignedToGroup(page, size, request, groupId, assembler)).withSelfRel())
+        );
+
+        return ResponseEntity.ok(PagedModel.of(
+                lessonPage.getContent(),
+                pagedModel.getMetadata()
+        ));
+    }
 }

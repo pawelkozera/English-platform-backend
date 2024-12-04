@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class LessonService {
 
     public Page<LessonResponse> getLessonsFromGroup(User user, Integer groupId, int page, int size) {
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
 
         boolean isMember = userGroupRepository.existsByUserAndGroup(user, group);
         if (!isMember) {
@@ -68,6 +69,28 @@ public class LessonService {
         Page<Lesson> lessonsPage = lessonRepository.findAllByGroupsContaining(group, pageable);
 
         return lessonsPage.map(lesson -> LessonResponse.builder()
+                .lessonId(lesson.getId())
+                .title(lesson.getTitle())
+                .build());
+    }
+
+    public Page<LessonResponse> getLessonsNotAssignedToGroup(User user, Integer groupId, int page, int size) {
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        if (groupOptional.isEmpty()) {
+            throw new EntityNotFoundException("Group not found");
+        }
+
+        Group group = groupOptional.get();
+
+        Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroup(user, group);
+        if (userGroupOptional.isEmpty() || !userGroupOptional.get().isOwner()) {
+            throw new IllegalArgumentException("User is not the owner of the group.");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Lesson> lessons = lessonRepository.findLessonsNotAssignedToGroup(groupId, pageable);
+
+        return lessons.map(lesson -> LessonResponse.builder()
                 .lessonId(lesson.getId())
                 .title(lesson.getTitle())
                 .build());

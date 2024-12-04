@@ -1,5 +1,6 @@
 package com.learning.english.controllers;
 
+import com.learning.english.dto.GroupAddLessonsRequest;
 import com.learning.english.dto.GroupCreateRequest;
 import com.learning.english.dto.GroupJoinRequest;
 import com.learning.english.models.User;
@@ -9,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/group")
@@ -33,6 +36,22 @@ public class GroupController {
             return ResponseEntity.ok("User successfully joined the group.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{groupId}/addLessons")
+    public ResponseEntity<String> addLessonsToGroup(
+            HttpServletRequest request,
+            @PathVariable Integer groupId,
+            @RequestBody GroupAddLessonsRequest requestBody
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        boolean isAssigned = groupService.addLessonsToGroup(user, groupId, requestBody.getLessonIds());
+
+        if (isAssigned) {
+            return ResponseEntity.ok("Lessons successfully added to group.");
+        } else {
+            return ResponseEntity.status(404).body("Group not found or user is not authorized to add lessons to this group.");
         }
     }
 }
