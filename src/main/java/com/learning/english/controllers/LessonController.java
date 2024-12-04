@@ -31,9 +31,25 @@ public class LessonController {
     }
 
     @GetMapping("all/from/group/{groupId}")
-    public List<LessonResponse> getLessonsFromGroup(HttpServletRequest request, @PathVariable Integer groupId) {
+    public ResponseEntity<PagedModel<LessonResponse>> getLessonsFromGroup(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
+            @PathVariable Integer groupId,
+            PagedResourcesAssembler<LessonResponse> assembler
+    ) {
         User user = authUtil.getAuthenticatedUser(request);
-        return lessonService.getLessonsFromGroup(user, groupId);
+        Page<LessonResponse> lessonPage = lessonService.getLessonsFromGroup(user, groupId, page, size);
+
+        PagedModel<EntityModel<LessonResponse>> pagedModel = assembler.toModel(lessonPage, lessonResponse ->
+                EntityModel.of(lessonResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsFromGroup(page, size, request, groupId, assembler)).withSelfRel())
+        );
+
+        return ResponseEntity.ok(PagedModel.of(
+                lessonPage.getContent(),
+                pagedModel.getMetadata()
+        ));
     }
 
     @GetMapping("all/for/display/{groupId}")

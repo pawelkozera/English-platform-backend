@@ -55,7 +55,7 @@ public class LessonService {
         lessonRepository.save(lesson);
     }
 
-    public List<LessonResponse> getLessonsFromGroup(User user, Integer groupId) {
+    public Page<LessonResponse> getLessonsFromGroup(User user, Integer groupId, int page, int size) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
@@ -64,14 +64,13 @@ public class LessonService {
             throw new IllegalArgumentException("User is not a member of the group");
         }
 
-        List<Lesson> lessons = lessonRepository.findAllByGroupsContaining(group);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Lesson> lessonsPage = lessonRepository.findAllByGroupsContaining(group, pageable);
 
-        return lessons.stream()
-                .map(lesson -> LessonResponse.builder()
-                        .lessonId(lesson.getId())
-                        .title(lesson.getTitle())
-                        .build())
-                .collect(Collectors.toList());
+        return lessonsPage.map(lesson -> LessonResponse.builder()
+                .lessonId(lesson.getId())
+                .title(lesson.getTitle())
+                .build());
     }
 
     public Page<LessonsDisplayResponse> getLessonsForDisplay(User user, Integer groupId, int page, int size) {
