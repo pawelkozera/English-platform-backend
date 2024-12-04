@@ -177,4 +177,65 @@ public class LessonService {
             return new TaskDisplayResponse(task.getId(), completed);
         }).collect(Collectors.toList());
     }
+
+    public Page<LessonWithGroupsResponse> getLessonsFromGroupWithId(User user, Integer groupId, int page, int size) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+
+        UserGroup userGroup = userGroupRepository.findByUserAndGroup(user, group)
+                .orElseThrow(() -> new IllegalArgumentException("User is not a member of the group"));
+
+        if (!userGroup.isOwner()) {
+            throw new IllegalArgumentException("User is not the owner of the group");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Lesson> lessons = lessonRepository.findByGroupsId(groupId, pageable);
+
+        return lessons.map(lesson -> {
+            List<Integer> groupIds = lesson.getGroups().stream()
+                    .map(Group::getId)
+                    .collect(Collectors.toList());
+
+            return new LessonWithGroupsResponse(
+                    lesson.getId(),
+                    lesson.getTitle(),
+                    groupIds
+            );
+        });
+    }
+
+    public boolean updateLesson(Integer lessonId, LessonUpdateRequest lessonUpdateRequest, User user) {
+        Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
+
+        if (lesson == null) {
+            return false;
+        }
+
+        boolean isOwner = false;
+        for (Group group : lesson.getGroups()) {
+            Optional<UserGroup> userGroup = userGroupRepository.findByUserAndGroup(user, group);
+            if (userGroup.isPresent()) {
+                UserGroup userGroup1 = userGroup.get();
+                if (userGroup1.isOwner()) {
+                    isOwner = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isOwner) {
+            return false;
+        }
+
+        lesson.setTitle(lessonUpdateRequest.getTitle());
+
+        List<Group> groups = groupRepository.findAllById(lessonUpdateRequest.getGroupIds());
+        lesson.setGroups(groups);
+
+        lessonRepository.save(lesson);
+
+        return true;
+    }
 }

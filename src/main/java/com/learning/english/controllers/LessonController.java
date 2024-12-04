@@ -107,4 +107,42 @@ public class LessonController {
                 pagedModel.getMetadata()
         ));
     }
+
+    @GetMapping("all/from/group/with/groupIds/{groupId}")
+    public ResponseEntity<PagedModel<LessonWithGroupsResponse>> getLessonsFromGroupWithId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request,
+            @PathVariable Integer groupId,
+            PagedResourcesAssembler<LessonWithGroupsResponse> assembler
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        Page<LessonWithGroupsResponse> lessonPage = lessonService.getLessonsFromGroupWithId(user, groupId, page, size);
+
+        PagedModel<EntityModel<LessonWithGroupsResponse>> pagedModel = assembler.toModel(lessonPage, lessonResponse ->
+                EntityModel.of(lessonResponse,
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsFromGroupWithId(page, size, request, groupId, assembler)).withSelfRel())
+        );
+
+        return ResponseEntity.ok(PagedModel.of(
+                lessonPage.getContent(),
+                pagedModel.getMetadata()
+        ));
+    }
+
+    @PutMapping("/{lessonId}/update")
+    public ResponseEntity<String> updateLesson(
+            HttpServletRequest request,
+            @PathVariable Integer lessonId,
+            @RequestBody LessonUpdateRequest lessonUpdateRequest
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        boolean success = lessonService.updateLesson(lessonId, lessonUpdateRequest, user);
+
+        if (success) {
+            return ResponseEntity.ok("Lesson updated successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to update lesson");
+        }
+    }
 }
