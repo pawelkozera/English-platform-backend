@@ -108,20 +108,19 @@ public class LessonController {
         ));
     }
 
-    @GetMapping("all/from/group/with/groupIds/{groupId}")
-    public ResponseEntity<PagedModel<LessonWithGroupsResponse>> getLessonsFromGroupWithId(
+    @GetMapping("all/owned/by/user")
+    public ResponseEntity<PagedModel<LessonWithGroupsResponse>> getLessonsOwnedByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request,
-            @PathVariable Integer groupId,
             PagedResourcesAssembler<LessonWithGroupsResponse> assembler
     ) {
         User user = authUtil.getAuthenticatedUser(request);
-        Page<LessonWithGroupsResponse> lessonPage = lessonService.getLessonsFromGroupWithId(user, groupId, page, size);
+        Page<LessonWithGroupsResponse> lessonPage = lessonService.getLessonsOwnedByUser(user, page, size);
 
         PagedModel<EntityModel<LessonWithGroupsResponse>> pagedModel = assembler.toModel(lessonPage, lessonResponse ->
                 EntityModel.of(lessonResponse,
-                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsFromGroupWithId(page, size, request, groupId, assembler)).withSelfRel())
+                        WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(LessonController.class).getLessonsOwnedByUser(page, size, request, assembler)).withSelfRel())
         );
 
         return ResponseEntity.ok(PagedModel.of(
@@ -143,6 +142,21 @@ public class LessonController {
             return ResponseEntity.ok("Lesson updated successfully");
         } else {
             return ResponseEntity.badRequest().body("Failed to update lesson");
+        }
+    }
+
+    @DeleteMapping("/{lessonId}/delete")
+    public ResponseEntity<String> deleteLesson(
+            HttpServletRequest request,
+            @PathVariable Integer lessonId
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        boolean success = lessonService.deleteLesson(lessonId, user);
+
+        if (success) {
+            return ResponseEntity.ok("Lesson deleted successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to delete lesson");
         }
     }
 }

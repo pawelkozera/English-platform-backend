@@ -4,6 +4,7 @@ import com.learning.english.dto.*;
 import com.learning.english.models.*;
 import com.learning.english.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,6 +47,7 @@ public class LessonService {
 
         Lesson lesson = Lesson.builder()
                 .title(lessonAddRequest.getTitle())
+                .owner(user)
                 .build();
 
         groups.forEach(group -> {
@@ -75,20 +77,8 @@ public class LessonService {
     }
 
     public Page<LessonResponse> getLessonsNotAssignedToGroup(User user, Integer groupId, int page, int size) {
-        Optional<Group> groupOptional = groupRepository.findById(groupId);
-        if (groupOptional.isEmpty()) {
-            throw new EntityNotFoundException("Group not found");
-        }
-
-        Group group = groupOptional.get();
-
-        Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroup(user, group);
-        if (userGroupOptional.isEmpty() || !userGroupOptional.get().isOwner()) {
-            throw new IllegalArgumentException("User is not the owner of the group.");
-        }
-
         Pageable pageable = PageRequest.of(page, size);
-        Page<Lesson> lessons = lessonRepository.findLessonsNotAssignedToGroup(groupId, pageable);
+        Page<Lesson> lessons = lessonRepository.findLessonsByOwner(user, pageable);
 
         return lessons.map(lesson -> LessonResponse.builder()
                 .lessonId(lesson.getId())
@@ -178,32 +168,19 @@ public class LessonService {
         }).collect(Collectors.toList());
     }
 
-    public Page<LessonWithGroupsResponse> getLessonsFromGroupWithId(User user, Integer groupId, int page, int size) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+    public Page<LessonWithGroupsResponse> getLessonsOwnedByUser(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Lesson> lessons = lessonRepository.findLessonsByOwner(user, pageable);
 
-        UserGroup userGroup = userGroupRepository.findByUserAndGroup(user, group)
-                .orElseThrow(() -> new IllegalArgumentException("User is not a member of the group"));
-
-        if (!userGroup.isOwner()) {
-            throw new IllegalArgumentException("User is not the owner of the group");
+        if (lessons.isEmpty()) {
+            return Page.empty();
         }
 
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<Lesson> lessons = lessonRepository.findByGroupsId(groupId, pageable);
-
-        return lessons.map(lesson -> {
-            List<Integer> groupIds = lesson.getGroups().stream()
-                    .map(Group::getId)
-                    .collect(Collectors.toList());
-
-            return new LessonWithGroupsResponse(
-                    lesson.getId(),
-                    lesson.getTitle(),
-                    groupIds
-            );
-        });
+        return lessons.map(lesson -> new LessonWithGroupsResponse(
+                lesson.getId(),
+                lesson.getTitle(),
+                lesson.getGroups().stream().map(Group::getId).toList()
+        ));
     }
 
     public boolean updateLesson(Integer lessonId, LessonUpdateRequest lessonUpdateRequest, User user) {
@@ -236,6 +213,27 @@ public class LessonService {
 
         lessonRepository.save(lesson);
 
+        return true;
+    }
+
+    public boolean deleteLesson(Integer lessonId, User user) {
+        Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
+
+        if (lesson == null) {
+            throw new IllegalArgumentException("Lesson not found");
+        }
+
+        if (!lesson.getOwner().equals(user)) {
+            throw new IllegalArgumentException("You are not authorized to delete this lesson");
+        }
+
+        // Remove associations
+        lesson.getGroups().forEach(group -> group.getLessons().remove(lesson));
+        lesson.getGroups().clear();
+
+        lessonRepository.save(lesson); // Save after breaking relationships
+
+        lessonRepository.delete(lesson); // Now delete the lesson
         return true;
     }
 }

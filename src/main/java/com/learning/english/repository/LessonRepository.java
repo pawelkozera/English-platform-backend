@@ -20,5 +20,9 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
             "(SELECT lg.id FROM Group g JOIN g.lessons lg WHERE g.id = :groupId)")
     Page<Lesson> findLessonsNotAssignedToGroup(@Param("groupId") Integer groupId, Pageable pageable);
 
-    Page<Lesson> findByGroupsId(Integer groupId, Pageable pageable);
+    @Query("SELECT l FROM Lesson l JOIN l.groups g WHERE g IN :groups")
+    Page<Lesson> findByGroupsIn(List<Group> groups, Pageable pageable);
+
+    @Query("SELECT l FROM Lesson l WHERE l.owner = :user")
+    Page<Lesson> findLessonsByOwner(@Param("user") User user, Pageable pageable);
 }

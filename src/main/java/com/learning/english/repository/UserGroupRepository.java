@@ -4,6 +4,8 @@ import com.learning.english.models.Group;
 import com.learning.english.models.User;
 import com.learning.english.models.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +19,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
     Optional<UserGroup> findByUserAndGroupId(User user, Integer groupId);
     boolean existsByUserAndGroupAndIsOwnerTrue(User user, Group group);
     boolean existsByUserAndGroup(User user, Group group);
+
+    @Query("SELECT ug.group FROM UserGroup ug WHERE ug.user = :user AND ug.isOwner = true")
+    List<Group> findOwnedGroupsByUser(@Param("user") User user);
 }
