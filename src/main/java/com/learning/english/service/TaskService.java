@@ -195,4 +195,15 @@ public class TaskService {
                         .collect(Collectors.toList()))
                 .build());
     }
+
+    public void deleteTask(User user, Integer taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        if (!task.getOwner().getId().equals(user.getId())) {
+            throw new SecurityException("You are not authorized to delete this task.");
+        }
+
+        taskRepository.delete(task);
+    }
 }

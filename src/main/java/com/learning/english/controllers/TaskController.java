@@ -74,5 +74,12 @@ public class TaskController {
 
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping("/{taskId}/delete")
+    public ResponseEntity<String> deleteTask(HttpServletRequest request, @PathVariable Integer taskId) {
+        User user = authUtil.getAuthenticatedUser(request);
+        taskService.deleteTask(user, taskId);
+        return ResponseEntity.ok("Task deleted successfully");
+    }
 }
 
