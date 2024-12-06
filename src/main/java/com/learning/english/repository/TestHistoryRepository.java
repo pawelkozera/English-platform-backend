@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,5 @@ public interface TestHistoryRepository extends CrudRepository<TestHistory, Integ
     Optional<TestHistory> findByTestInstanceAndUser(TestInstance testInstance, User user);
     Optional<TestHistory> findByTestInstanceIdAndUserId(Integer testInstanceId, Integer userId);
     Page<TestHistory> findByUserAndTestInstanceGroupId(User user, Integer groupId, Pageable pageable);
+    List<TestHistory> findByTestInstanceIdAndTestInstanceGroupId(Integer testInstanceId, Integer groupId);
 }

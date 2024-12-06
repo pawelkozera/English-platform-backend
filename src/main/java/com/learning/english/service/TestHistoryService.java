@@ -1,12 +1,7 @@
 package com.learning.english.service;
 
-import com.learning.english.dto.TestHistoryAddRequest;
-import com.learning.english.dto.TestHistoryDisplayResponse;
-import com.learning.english.dto.TestInstanceDisplayResponse;
-import com.learning.english.models.TestHistory;
-import com.learning.english.models.TestInstance;
-import com.learning.english.models.User;
-import com.learning.english.models.UserGroup;
+import com.learning.english.dto.*;
+import com.learning.english.models.*;
 import com.learning.english.repository.TestHistoryRepository;
 import com.learning.english.repository.TestInstanceRepository;
 import com.learning.english.repository.UserGroupRepository;
@@ -128,4 +123,34 @@ public class TestHistoryService {
         return new PageImpl<>(displayResponses, pageable, testHistoryPage.getTotalElements());
     }
 
+    public List<TestResultDto> getTestResults(Integer testInstanceId, Integer groupId, User currentUser) {
+        boolean isOwner = userGroupRepository.existsByGroupIdAndUserIdAndIsOwnerTrue(groupId, currentUser.getId());
+        if (!isOwner) {
+            throw new AccessDeniedException("You are not the owner of this group.");
+        }
+
+        List<TestHistory> testHistories = testHistoryRepository.findByTestInstanceIdAndTestInstanceGroupId(testInstanceId, groupId);
+        return testHistories.stream()
+                .map(this::mapToTestResultDto)
+                .toList();
+    }
+
+    private TestResultDto mapToTestResultDto(TestHistory testHistory) {
+        TestTemplate testTemplate = testHistory.getTestInstance().getTestTemplate();
+        return TestResultDto.builder()
+                .userId(testHistory.getUser().getId())
+                .userName(testHistory.getUser().getFirstName() + " " + testHistory.getUser().getLastName())
+                .score(testHistory.getScore())
+                .completedAt(testHistory.getCompletedAt())
+                .suspiciousActivityDetected(testHistory.isSuspiciousActivityDetected())
+                .suspiciousActivities(testHistory.getSuspiciousActivities().stream()
+                        .map(activity -> new SuspiciousActivityDto(
+                                activity.getTimestamp(),
+                                activity.getDescription(),
+                                activity.getOccurrenceCount()
+                        ))
+                        .toList())
+                .totalScore(testTemplate != null ? testTemplate.getTotalScore() : null)
+                .build();
+    }
 }

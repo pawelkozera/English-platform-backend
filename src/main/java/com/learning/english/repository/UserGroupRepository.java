@@ -22,4 +22,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Integer> {
 
     @Query("SELECT ug.group FROM UserGroup ug WHERE ug.user = :user AND ug.isOwner = true")
     List<Group> findOwnedGroupsByUser(@Param("user") User user);
+
+    boolean existsByGroup_IdAndUser_Id(Integer groupId, Integer id);
+    boolean existsByGroupIdAndUserIdAndIsOwnerTrue(Integer groupId, Integer userId);
 }

@@ -3,6 +3,7 @@ package com.learning.english.service;
 import com.learning.english.dto.TaskDisplayResponse;
 import com.learning.english.dto.TestInstanceAddRequest;
 import com.learning.english.dto.TestInstanceDisplayResponse;
+import com.learning.english.dto.TestInstanceResponse;
 import com.learning.english.models.*;
 import com.learning.english.repository.TestInstanceRepository;
 import com.learning.english.repository.TestTemplateRepository;
@@ -15,12 +16,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +103,25 @@ public class TestInstanceService {
         return testInstance.getTestTemplate().getTasks().stream()
                 .map(Task::getId)
                 .collect(Collectors.toList());
+    }
+
+    public List<TestInstanceResponse> getTestInstancesByGroupAndUser(Integer groupId, User user) {
+        boolean isMember = userGroupRepository.existsByGroup_IdAndUser_Id(groupId, user.getId());
+        if (!isMember) {
+            throw new ResponseStatusException(FORBIDDEN, "Użytkownik nie należy do tej grupy.");
+        }
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Grupa nie istnieje."));
+        List<TestInstance> testInstances = testInstanceRepository.findAllByGroup_Id(groupId);
+
+        return testInstances.stream()
+                .map(test -> TestInstanceResponse.builder()
+                        .id(test.getId())
+                        .activationTime(test.getActivationTime())
+                        .endTime(test.getEndTime())
+                        .name(test.getTestTemplate().getName())
+                        .build())
+                .toList();
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -73,5 +74,13 @@ public class TestHistoryController {
         );
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{testInstanceId}/group/{groupId}/results")
+    public ResponseEntity<?> getTestResultsForGroup(
+            @PathVariable Integer testInstanceId,
+            @PathVariable Integer groupId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(testHistoryService.getTestResults(testInstanceId, groupId, currentUser));
     }
 }

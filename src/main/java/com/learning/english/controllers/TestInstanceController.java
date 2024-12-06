@@ -2,6 +2,7 @@ package com.learning.english.controllers;
 
 import com.learning.english.dto.TestInstanceAddRequest;
 import com.learning.english.dto.TestInstanceDisplayResponse;
+import com.learning.english.dto.TestInstanceResponse;
 import com.learning.english.models.User;
 import com.learning.english.service.TestInstanceService;
 import com.learning.english.utils.AuthUtil;
@@ -13,6 +14,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,5 +65,13 @@ public class TestInstanceController {
         User user = authUtil.getAuthenticatedUser(request);
         List<Integer> tasks = testInstanceService.getTasksForTestInstance(user, testInstanceId);
         return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/instances/group/{groupId}")
+    public List<TestInstanceResponse> getTestInstances(
+            @PathVariable Integer groupId,
+            @AuthenticationPrincipal User user) {
+
+        return testInstanceService.getTestInstancesByGroupAndUser(groupId, user);
     }
 }
