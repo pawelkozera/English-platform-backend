@@ -52,4 +52,14 @@ public class TestTemplateController {
 
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping("{testTemplateId}/delete")
+    public ResponseEntity<String> deleteTestTemplate(
+            HttpServletRequest request,
+            @PathVariable Integer testTemplateId
+    ) {
+        User user = authUtil.getAuthenticatedUser(request);
+        testTemplateService.deleteTestTemplate(testTemplateId, user);
+        return ResponseEntity.ok("Test instance deleted successfully");
+    }
 }

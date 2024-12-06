@@ -5,8 +5,10 @@ import com.learning.english.dto.TemplateAddRequest;
 import com.learning.english.dto.TestTemplateResponse;
 import com.learning.english.dto.WordResponse;
 import com.learning.english.models.Task;
+import com.learning.english.models.TestInstance;
 import com.learning.english.models.TestTemplate;
 import com.learning.english.models.User;
+import com.learning.english.repository.GroupRepository;
 import com.learning.english.repository.TaskRepository;
 import com.learning.english.repository.TestTemplateRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class TestTemplateService {
     private final TaskRepository taskRepository;
     private final TestTemplateRepository testTemplateRepository;
+    private final GroupRepository groupRepository;
 
     @Transactional
     public void addTemplate(TemplateAddRequest templateAddRequest, User user) {
@@ -74,5 +77,17 @@ public class TestTemplateService {
             return new TestTemplateResponse(testTemplate.getName(), testTemplate.getId(), taskResponses);
         });
     }
+
+    public void deleteTestTemplate(Integer testTemplateId, User user) {
+        TestTemplate testTemplate = testTemplateRepository.findById(testTemplateId)
+                .orElseThrow(() -> new IllegalArgumentException("Test template not found"));
+
+        if (!testTemplate.getOwner().equals(user)) {
+            throw new SecurityException("You are not authorized to delete this test template");
+        }
+
+        testTemplateRepository.delete(testTemplate);
+    }
+
 }
 

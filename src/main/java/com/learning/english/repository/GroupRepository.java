@@ -1,6 +1,7 @@
 package com.learning.english.repository;
 
 import com.learning.english.models.Group;
+import com.learning.english.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     @Query("SELECT CASE WHEN COUNT(ug) > 0 THEN true ELSE false END " +
             "FROM UserGroup ug WHERE ug.group.id = :groupId AND ug.user.id = :userId")
     boolean existsByGroupIdAndUserId(@Param("groupId") Integer groupId, @Param("userId") Integer userId);
+
+    @Query("SELECT ug.user FROM UserGroup ug WHERE ug.group.id = :groupId AND ug.isOwner = true")
+    User findOwnerByGroupId(@Param("groupId") Integer groupId);
 }
