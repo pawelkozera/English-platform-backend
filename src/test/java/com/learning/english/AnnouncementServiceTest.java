@@ -194,7 +194,7 @@ class AnnouncementServiceTest {
                 .thenReturn(Optional.of(userAnnouncement));
 
         Page<AnnouncementDisplayResponse> result = announcementService.getAnnouncementsForDisplay(user, 1, 0, 10);
-        
+
         assertEquals(1, result.getTotalElements());
         assertEquals("Test Announcement", result.getContent().getFirst().getTitle());
         assertEquals("This is a test", result.getContent().getFirst().getContent());
