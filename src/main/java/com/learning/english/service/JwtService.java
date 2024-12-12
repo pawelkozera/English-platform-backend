@@ -63,4 +63,8 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public JwtService(@Value("${token.signing.key}") String jwtSigningKey) {
+        this.jwtSigningKey = jwtSigningKey;
+    }
 }
