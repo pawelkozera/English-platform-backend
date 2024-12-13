@@ -227,13 +227,12 @@ public class LessonService {
             throw new IllegalArgumentException("You are not authorized to delete this lesson");
         }
 
-        // Remove associations
         lesson.getGroups().forEach(group -> group.getLessons().remove(lesson));
         lesson.getGroups().clear();
 
-        lessonRepository.save(lesson); // Save after breaking relationships
+        lessonRepository.save(lesson);
 
-        lessonRepository.delete(lesson); // Now delete the lesson
+        lessonRepository.delete(lesson);
         return true;
     }
 }
