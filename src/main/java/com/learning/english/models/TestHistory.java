@@ -1,8 +1,7 @@
 package com.learning.english.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +11,9 @@ import java.util.UUID;
 @Table(name = "test_history")
 @Setter
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TestHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
