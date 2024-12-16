@@ -18,4 +18,8 @@ public class TaskType {
     private Integer id;
 
     private String typeName;
+
+    public TaskType(String typeName) {
+        this.typeName = typeName;
+    }
 }

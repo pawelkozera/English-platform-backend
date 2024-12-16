@@ -32,4 +32,18 @@ public class Word {
 
     @ManyToMany(mappedBy = "words")
     private List<Task> tasks;
+
+    public Word(Long id, String word, String translation) {
+        this.id = id;
+        this.word = word;
+        this.translation = translation;
+    }
+
+    public Word(long id, String word, String translation, String audioPath, String imagePath) {
+        this.id = id;
+        this.word = word;
+        this.translation = translation;
+        this.audioFilePath = audioPath;
+        this.imageFilePath = imagePath;
+    }
 }

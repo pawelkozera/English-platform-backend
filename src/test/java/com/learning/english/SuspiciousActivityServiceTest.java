@@ -85,11 +85,10 @@ public class SuspiciousActivityServiceTest {
     public void testAddSuspiciousActivity_NoTestHistoryFound() {
         when(testHistoryRepository.findByTestInstanceIdAndUserId(anyInt(), anyInt()))
                 .thenReturn(Optional.empty());
-        
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 suspiciousActivityService.addSuspiciousActivity(suspiciousActivityAddRequest, user)
         );
         assertEquals("No TestHistory found for the given TestInstance and User", exception.getMessage());
     }
 }
-

@@ -174,7 +174,6 @@ public class TaskService {
         }
     }
 
-
     public Page<TaskResponse> getTasksOwnedByUser(User user, int page, int size) {
         Page<Task> taskPage = taskRepository.findByOwner(user, PageRequest.of(page, size));
 

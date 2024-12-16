@@ -18,4 +18,8 @@ public class TaskSubType {
     private Integer id;
 
     private String subTypeName;
+
+    public TaskSubType(String subTypeName) {
+        this.subTypeName = subTypeName;
+    }
 }
