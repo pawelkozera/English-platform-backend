@@ -1,4 +1,4 @@
-package com.learning.english;
+package com.learning.english.unit;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,14 +14,16 @@ import com.learning.english.repository.RepetitionWordRepository;
 import com.learning.english.repository.WordRepository;
 import com.learning.english.service.RepetitionService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class RepetitionServiceTest {
 
     @Mock
@@ -145,22 +147,12 @@ public class RepetitionServiceTest {
         assertEquals("Test Translation", responses.get(0).getTranslation());
     }
 
-
     @Test
     public void testGetRepetitionWords_withAnsweredWordIds() {
         User user = mock(User.class);
         RepetitionDisplayRequest request = mock(RepetitionDisplayRequest.class);
         when(request.getLimit()).thenReturn(10);
         when(request.getAnsweredWordIds()).thenReturn(List.of(1));
-
-        RepetitionWord repetitionWord1 = mock(RepetitionWord.class);
-        Word word1 = mock(Word.class);
-        when(word1.getWord()).thenReturn("Test 1");
-        when(word1.getTranslation()).thenReturn("Test 1 Translation");
-        when(word1.getAudioFilePath()).thenReturn("audio1/path");
-        when(word1.getImageFilePath()).thenReturn("image1/path");
-        when(repetitionWord1.getWord()).thenReturn(word1);
-        when(repetitionWord1.getId()).thenReturn(1);
 
         RepetitionWord repetitionWord2 = mock(RepetitionWord.class);
         Word word2 = mock(Word.class);
@@ -171,7 +163,8 @@ public class RepetitionServiceTest {
         when(repetitionWord2.getWord()).thenReturn(word2);
         when(repetitionWord2.getId()).thenReturn(2);
 
-        when(repetitionWordRepository.findDueRepetitionsExcludingAnswered(user.getId(), request.getGroupId(), List.of(1), PageRequest.of(0, 10)))
+        when(repetitionWordRepository.findDueRepetitionsExcludingAnswered(
+                user.getId(), request.getGroupId(), List.of(1), PageRequest.of(0, 10)))
                 .thenReturn(List.of(repetitionWord2));
 
         List<RepetitionDisplayResponse> responses = repetitionService.getRepetitionWords(user, request);
@@ -180,7 +173,6 @@ public class RepetitionServiceTest {
         assertEquals("Test 2", responses.get(0).getWord());
         assertEquals("Test 2 Translation", responses.get(0).getTranslation());
     }
-
 
     @Test
     public void testGetRepetitionWords_emptyResult() {

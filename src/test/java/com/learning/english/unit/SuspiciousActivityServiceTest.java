@@ -1,4 +1,4 @@
-package com.learning.english;
+package com.learning.english.unit;
 
 import com.learning.english.dto.SuspiciousActivityAddRequest;
 import com.learning.english.models.SuspiciousActivity;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,11 +1,10 @@
-package com.learning.english;
+package com.learning.english.unit;
 
 import com.learning.english.utils.TokenCookies;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.ResponseCookie;
 
 import static org.junit.jupiter.api.Assertions.*;

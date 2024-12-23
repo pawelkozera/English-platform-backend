@@ -1,11 +1,9 @@
-package com.learning.english;
+package com.learning.english.unit;
 
-import com.learning.english.dto.TestHistoryAddRequest;
 import com.learning.english.dto.TestInstanceAddRequest;
 import com.learning.english.dto.TestInstanceDisplayResponse;
 import com.learning.english.models.*;
 import com.learning.english.repository.*;
-import com.learning.english.service.TestHistoryService;
 import com.learning.english.service.TestInstanceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,6 @@ import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +27,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class TestInstanceServiceTest {

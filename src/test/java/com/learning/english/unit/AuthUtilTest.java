@@ -1,4 +1,4 @@
-package com.learning.english;
+package com.learning.english.unit;
 
 import com.learning.english.models.User;
 import com.learning.english.service.JwtService;

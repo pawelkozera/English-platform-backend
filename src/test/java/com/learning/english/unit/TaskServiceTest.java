@@ -1,4 +1,4 @@
-package com.learning.english;
+package com.learning.english.unit;
 
 import com.learning.english.dto.TaskAddRequest;
 import com.learning.english.dto.TaskCompleteRequest;
@@ -19,7 +19,6 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

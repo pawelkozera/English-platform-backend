@@ -6,7 +6,7 @@ spring:
     name: english
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/english
+    url: jdbc:postgresql://localhost:5432/english_tests
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -14,7 +14,7 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 
   web:
     resources:
