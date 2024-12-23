@@ -25,6 +25,13 @@ public class GroupService {
     private final LessonRepository lessonRepository;
 
     public void createGroup(GroupCreateRequest groupCreateRequest, User user) {
+        if (groupCreateRequest.getGroupName() == null || groupCreateRequest.getGroupName().isEmpty()) {
+            throw new IllegalArgumentException("Group name cannot be empty");
+        }
+        if (groupCreateRequest.getPassword() == null || groupCreateRequest.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
         String groupCode = generateUniqueGroupCode();
 
         Group group = Group.builder()

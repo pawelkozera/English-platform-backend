@@ -18,4 +18,6 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
 
     @Query("SELECT ug.user FROM UserGroup ug WHERE ug.group.id = :groupId AND ug.isOwner = true")
     User findOwnerByGroupId(@Param("groupId") Integer groupId);
+
+    Optional<Group> findByGroupName(String groupName);
 }
