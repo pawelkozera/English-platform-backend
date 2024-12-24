@@ -66,5 +66,4 @@ public class RepetitionController {
 
         return ResponseEntity.ok("Repetitions updated successfully");
     }
-
 }
