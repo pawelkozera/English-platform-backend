@@ -31,7 +31,7 @@ public class AuthenticationControllerTest {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    @MockBean
+    @Autowired
     private JwtService jwtService;
 
     @Autowired

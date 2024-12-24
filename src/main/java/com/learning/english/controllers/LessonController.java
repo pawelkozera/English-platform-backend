@@ -27,7 +27,7 @@ public class LessonController {
     public ResponseEntity<String> addLesson(HttpServletRequest request, @RequestBody LessonAddRequest lessonAddRequest) {
         User user = authUtil.getAuthenticatedUser(request);
         lessonService.addLesson(lessonAddRequest, user);
-        return ResponseEntity.ok("Task created successfully");
+        return ResponseEntity.ok("Lesson created successfully");
     }
 
     @GetMapping("all/from/group/{groupId}")

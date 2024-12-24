@@ -60,7 +60,7 @@ public class LessonService {
 
     public Page<LessonResponse> getLessonsFromGroup(User user, Integer groupId, int page, int size) {
         Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         boolean isMember = userGroupRepository.existsByUserAndGroup(user, group);
         if (!isMember) {
