@@ -83,7 +83,7 @@ public class TestTemplateService {
                 .orElseThrow(() -> new IllegalArgumentException("Test template not found"));
 
         if (!testTemplate.getOwner().equals(user)) {
-            throw new SecurityException("You are not authorized to delete this test template");
+            throw new IllegalArgumentException("You are not authorized to delete this test template");
         }
 
         testTemplateRepository.delete(testTemplate);
