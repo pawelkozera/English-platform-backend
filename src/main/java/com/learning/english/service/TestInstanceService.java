@@ -37,18 +37,18 @@ public class TestInstanceService {
 
     public void addTestInstance(TestInstanceAddRequest testInstanceAddRequest, User user) {
         TestTemplate testTemplate = testTemplateRepository.findById(testInstanceAddRequest.getTestTemplateId())
-                .orElseThrow(() -> new RuntimeException("TestTemplate not found"));
+                .orElseThrow(() -> new IllegalArgumentException("TestTemplate not found"));
 
         if (!testTemplate.getOwner().equals(user)) {
-            throw new RuntimeException("You are not the owner of this TestTemplate");
+            throw new IllegalArgumentException("You are not the owner of this TestTemplate");
         }
 
         Group group = groupRepository.findById(testInstanceAddRequest.getGroupId())
-                .orElseThrow(() -> new RuntimeException("Group not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
 
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroup(user, group);
         if (userGroupOptional.isEmpty() || !userGroupOptional.get().isOwner()) {
-            throw new RuntimeException("You must be the owner of the group to create a test instance.");
+            throw new IllegalArgumentException("You must be the owner of the group to create a test instance.");
         }
 
         TestInstance testInstance = TestInstance.builder()
@@ -89,7 +89,6 @@ public class TestInstanceService {
 
         return new PageImpl<>(displayResponses, pageable, testInstances.getTotalElements());
     }
-
 
     public List<Integer> getTasksForTestInstance(User user, Integer testInstanceId) {
         TestInstance testInstance = testInstanceRepository.findById(testInstanceId)

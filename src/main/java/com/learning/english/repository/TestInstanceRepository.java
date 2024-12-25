@@ -12,4 +12,6 @@ import java.util.List;
 public interface TestInstanceRepository extends CrudRepository<TestInstance, Integer> {
     Page<TestInstance> findByGroupId(Integer groupId, Pageable pageable);
     List<TestInstance> findAllByGroup_Id(Integer groupId);
+
+    boolean existsByTestTemplateIdAndGroupId(int testTemplateId, int groupId);
 }
