@@ -142,7 +142,7 @@ class LessonServiceTest {
         Integer groupId = 1;
         when(groupRepository.findById(groupId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             lessonService.getLessonsFromGroup(mockUser, groupId, 0, 10);
         });
     }
