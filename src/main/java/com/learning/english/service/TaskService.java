@@ -200,7 +200,7 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
         if (!task.getOwner().getId().equals(user.getId())) {
-            throw new SecurityException("You are not authorized to delete this task.");
+            throw new IllegalArgumentException("You are not authorized to delete this task.");
         }
 
         taskRepository.delete(task);
