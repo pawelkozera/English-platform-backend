@@ -676,7 +676,7 @@ public class TaskServiceTest {
 
         when(taskRepository.findById(1)).thenReturn(Optional.of(task));
 
-        SecurityException exception = assertThrows(SecurityException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             taskService.deleteTask(nonOwner, 1);
         });
         assertEquals("You are not authorized to delete this task.", exception.getMessage());

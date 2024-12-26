@@ -225,7 +225,7 @@ public class TestTemplateServiceTest {
 
         when(testTemplateRepository.findById(1)).thenReturn(java.util.Optional.of(testTemplate));
 
-        SecurityException exception = assertThrows(SecurityException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             testTemplateService.deleteTestTemplate(1, nonOwner);
         });
 
