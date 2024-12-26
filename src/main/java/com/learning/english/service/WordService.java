@@ -49,7 +49,7 @@ public class WordService {
                 .orElseThrow(() -> new IllegalArgumentException("Word not found"));
 
         if (!word.getCreatedBy().getId().equals(user.getId())) {
-            throw new SecurityException("You are not allowed to edit this word");
+            throw new IllegalArgumentException("You are not allowed to edit this word");
         }
 
         word.setWord(wordUpdateRequest.getWord());
