@@ -132,7 +132,8 @@ public class RepetitionService {
         } else if (grade == 2) {
             repetitionWord.setInterval(Math.max(1, (int) (repetitionWord.getInterval() * 0.5)));
         } else {
-            repetitionWord.setInterval(repetitionWord.getInterval() == 0 ? 1 : (int) (repetitionWord.getInterval() * repetitionWord.getEFactor()));
+            repetitionWord.setInterval(repetitionWord.getInterval() == 0 ? 1 : (int)
+                    (repetitionWord.getInterval() * repetitionWord.getEFactor()));
         }
 
         repetitionWord.setNextReviewDate(LocalDate.now().plusDays(repetitionWord.getInterval()));

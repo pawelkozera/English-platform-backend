@@ -390,7 +390,7 @@ public class RepetitionControllerTest {
                         .cookie(new Cookie("accessToken", jwtToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateRequests)))
-                .andExpect(status().isBadRequest())  // Oczekujemy statusu 400
+                .andExpect(status().isBadRequest())
                 .andExpect(content().string("Invalid grade"));
     }
 
